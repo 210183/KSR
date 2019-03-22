@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AttributesExtraction
+namespace Classification
 {
     public class Class1
     {
