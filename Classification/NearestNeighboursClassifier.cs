@@ -1,28 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Classification.Metrics;
+﻿using Classification.Metrics;
+using Classification.Models;
 using Core.Models;
+using System.Linq;
 
 namespace Classification
 {
     public static class NearestNeighboursClassifier
     {
         public static DataSample Classify(
-            List<double> newSampleAttributes,
-            List<DataSample> classifiedSamples,
+            OrderedAttributes newSampleAttributes,
+            SamplesCollection classifiedSamples,
             int neighboursCount,
             IMetric metric)
         {
 
-            var distances = classifiedSamples
-                .Select(s => metric.Distance(s.Attributes, newSampleAttributes))
+            var distances = classifiedSamples.Samples
+                .Select(s => new
+                {
+                    labels = s.Labels,
+                    distane = metric.Distance(s.Attributes.Values, newSampleAttributes.Values)
+                })
                 .ToList();
 
-            distances.Sort();
+            distances.Sort((p, n) => p.distane.CompareTo(n.distane));
 
             distances = distances.Take(neighboursCount).ToList();
 
+            //TODO: implement k usage
+
+            return new DataSample(
+                newSampleAttributes,
+                distances.First().labels
+                );
         }
     }
 }

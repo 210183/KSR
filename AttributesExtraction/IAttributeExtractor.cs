@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Core.Models;
+﻿using System.Collections.Generic;
 
 namespace AttributesExtraction
 {

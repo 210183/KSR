@@ -1,12 +1,13 @@
-﻿using System;
+﻿using AttributesExtraction;
+using AttributesExtraction.Extractors;
+using Classification;
+using Classification.Metrics;
+using Classification.Models;
+using Core.Models;
+using FileSamplesRead;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using AttributesExtraction;
-using AttributesExtraction.Extractors;
-using Core.Models;
 
 namespace ConsoleApp
 {
@@ -23,9 +24,19 @@ namespace ConsoleApp
             two months ago.
                 The ministry and Sandoz will each have a 50 pct stake, but
             a company spokeswoman was unable to give details of the size of
-            investment or planned output.";
+            investment or planned output.
+            Soviet Soviet Soviet";
 
+            //Classification(text);
 
+            var dataReader = new DataSamplesReader();
+            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm");
+
+            Console.Read();
+        }
+
+        private static void Classification(string text)
+        {
             IAttributeExtractor extractor = new CountExtractor(
                 new List<string>()
                 {
@@ -33,11 +44,37 @@ namespace ConsoleApp
                 },
                 "SovietCount");
 
-            var attributes = extractor.Extract(text.Split(null).ToList());
+            (string name, double attributeCount) = extractor.Extract(text.Split(null).ToList());
 
-            DataSample sample = new DataSample();
-
-
+            var newClassifiedSample = NearestNeighboursClassifier.Classify(
+                new OrderedAttributes(
+                    new List<double> { attributeCount },
+                    new List<string> { name }),
+                new SamplesCollection(new List<DataSample>()
+                {
+                    new DataSample(
+                        new OrderedAttributes(
+                            new List<double>() {1},
+                            new List<string>() {"SovietCount"}
+                        ),
+                        new LabelsCollection(new List<string>() {"A bit soviet"})),
+                    new DataSample(
+                        new OrderedAttributes(
+                            new List<double> {2},
+                            new List<string> {"SovietCount"}
+                        ),
+                        new LabelsCollection(new List<string> {"More soviet"})),
+                    new DataSample(
+                        new OrderedAttributes(
+                            new List<double> {4},
+                            new List<string> {"SovietCount"}
+                        ),
+                        new LabelsCollection(new List<string> {"Любимый сын Матери России"}))
+                }),
+                4,
+                new ManhattanMetric()
+            );
+            newClassifiedSample.Labels.Labels.ToList().ForEach(Console.WriteLine);
         }
     }
 }

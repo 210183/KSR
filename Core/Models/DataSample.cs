@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
     public class DataSample
     {
-        public IReadOnlyList<double> Attributes { get; }
-        public IReadOnlyList<string> AttributesNamesInOrder { get; }
-        public IReadOnlyList<string> Labels { get; }
+        public DataSample(OrderedAttributes attributes,
+            LabelsCollection labels)
+        {
+            Attributes = attributes;
+            Labels = labels;
+        }
+
+        public OrderedAttributes Attributes { get; }
+        public LabelsCollection Labels { get; }
     }
 }

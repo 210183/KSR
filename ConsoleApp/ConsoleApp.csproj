@@ -53,9 +53,17 @@
       <Project>{5AA638DB-143B-4734-9F16-7252BB917464}</Project>
       <Name>AttributesExtraction</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Classification\Classification.csproj">
+      <Project>{40DF815D-A411-4464-8A96-D8A2A1E3C66D}</Project>
+      <Name>Classification</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{BCD16D1D-A813-4FFD-BC1A-EB56C3276BD3}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileSamplesRead\FileSamplesRead.csproj">
+      <Project>{B5EDD902-24DC-4E3B-8892-9FAA5E422EC6}</Project>
+      <Name>FileSamplesRead</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
