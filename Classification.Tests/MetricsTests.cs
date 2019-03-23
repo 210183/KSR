@@ -12,6 +12,7 @@ namespace Classification.Tests
 
         [TestCase(MetricType.Manhattan, 0.0)]
         [TestCase(MetricType.Euclidean, 0.0)]
+        [TestCase(MetricType.Chebyshev, 0.0)]
         public void Both_Zero(MetricType type, double correctDistance)
         {
             TestDistance(type,
@@ -28,6 +29,7 @@ namespace Classification.Tests
 
         [TestCase(MetricType.Manhattan, 40.4)]
         [TestCase(MetricType.Euclidean, 37.4)]
+        [TestCase(MetricType.Chebyshev, 37.3)]
         public void One_Zero(MetricType type, double correctDistance)
         {
             TestDistance(type,
@@ -44,6 +46,7 @@ namespace Classification.Tests
 
         [TestCase(MetricType.Manhattan, 6)]
         [TestCase(MetricType.Euclidean, 5.099)]
+        [TestCase(MetricType.Chebyshev, 5)]
         public void Both_NonZero(MetricType type, double correctDistance)
         {
             TestDistance(type,
@@ -79,6 +82,9 @@ namespace Classification.Tests
                     return;
                 case MetricType.Euclidean:
                     _metric = new EuclideanMetric();
+                    return;
+                case MetricType.Chebyshev:
+                    _metric = new ChebyshevMetric();
                     return;
                 default:
                     throw new NotImplementedException("Unknown metric type");

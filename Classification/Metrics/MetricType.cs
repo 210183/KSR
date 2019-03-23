@@ -5,5 +5,6 @@
         Unknown = 0,
         Manhattan,
         Euclidean,
+        Chebyshev
     }
 }
