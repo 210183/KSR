@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Classification.Exceptions
+namespace Core.Exceptions
 {
     public class SamplesException : ApplicationException
     {

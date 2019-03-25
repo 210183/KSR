@@ -2,8 +2,8 @@
 using AttributesExtraction.Extractors;
 using Classification;
 using Classification.Metrics;
-using Classification.Models;
 using Core.Models;
+using Core.Models.Concrete;
 using FileSamplesRead;
 using System;
 using System.Collections.Generic;
@@ -57,24 +57,24 @@ namespace ConsoleApp
                             new List<double>() {1},
                             new List<string>() {"SovietCount"}
                         ),
-                        new LabelsCollection(new List<string>() {"A bit soviet"})),
+                        new LabelsCollection(new List<Label>() {new Label("A bit soviet")})),
                     new DataSample(
                         new OrderedAttributes(
                             new List<double> {2},
                             new List<string> {"SovietCount"}
                         ),
-                        new LabelsCollection(new List<string> {"More soviet"})),
+                        new LabelsCollection(new List<Label> {new Label("More soviet")})),
                     new DataSample(
                         new OrderedAttributes(
                             new List<double> {4},
                             new List<string> {"SovietCount"}
                         ),
-                        new LabelsCollection(new List<string> {"Любимый сын Матери России"}))
+                        new LabelsCollection(new List<Label> {new Label("Любимый сын Матери России")}))
                 }),
                 4,
                 new ManhattanMetric()
             );
-            newClassifiedSample.Labels.Labels.ToList().ForEach(Console.WriteLine);
+            newClassifiedSample.Labels.Values.Select(l => l.Name).ToList().ForEach(Console.WriteLine);
         }
     }
 }

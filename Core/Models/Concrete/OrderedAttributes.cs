@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.Models
+namespace Core.Models.Concrete
 {
-    public class OrderedAttributes
+    public class OrderedAttributes : IOrderedAttributes
     {
         public OrderedAttributes(IReadOnlyList<double> attributes, IReadOnlyList<string> attributesNamesInOrder)
         {

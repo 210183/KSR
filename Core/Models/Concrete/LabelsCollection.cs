@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.Models
+namespace Core.Models.Concrete
 {
-    public class LabelsCollection
+    public class LabelsCollection : ILabelsCollection
     {
-        public LabelsCollection(IReadOnlyList<string> labels)
+        public LabelsCollection(IReadOnlyList<Label> labels)
         {
             if (labels?.Any() == true)
             {
-                Labels = labels;
+                Values = labels;
             }
             else
             {
@@ -18,6 +18,6 @@ namespace Core.Models
             }
         }
 
-        public IReadOnlyList<string> Labels { get; }
+        public IReadOnlyList<Label> Values { get; }
     }
 }

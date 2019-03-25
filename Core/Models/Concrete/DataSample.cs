@@ -1,6 +1,6 @@
-﻿namespace Core.Models
+﻿namespace Core.Models.Concrete
 {
-    public class DataSample
+    public class DataSample : IDataSample
     {
         public DataSample(OrderedAttributes attributes,
             LabelsCollection labels)

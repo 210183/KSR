@@ -1,6 +1,6 @@
 ﻿using Classification.Metrics;
-using Classification.Models;
 using Core.Models;
+using Core.Models.Concrete;
 using System.Linq;
 
 namespace Classification

@@ -1,9 +1,9 @@
-﻿using Classification.Exceptions;
-using Core.Models;
+﻿using Core.Exceptions;
+using Core.Models.Concrete;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Classification.Models
+namespace Core.Models
 {
     public class SamplesCollection
     {
