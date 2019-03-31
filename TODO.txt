@@ -1,4 +1,4 @@
-- calculate specificity
+- [V] calculate specificity
 - UI
 -	- window1: 
 -	-	- point to directory with files (seprate window ? )
@@ -10,3 +10,4 @@
 -	-	- click classify
 -	-	- show classification results
 - read labels from file
+- preprocessing
