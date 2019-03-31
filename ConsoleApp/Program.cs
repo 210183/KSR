@@ -4,6 +4,7 @@ using Classification;
 using Classification.Metrics;
 using Core.Models;
 using Core.Models.Concrete;
+using DataPreprocessing;
 using FileSamplesRead;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,9 @@ namespace ConsoleApp
 
             var dataReader = new DataSamplesReader();
             var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm", "places");
-            var sam = samples.Last();
+            var sam = samples.First();
+            var filter = new StopWordsFilter(new List<string>{"a", "to", "in", "and", "of", ","});
+            var filtered = filter.Filter(sam.Value.Body).ToList();
             Console.Read();
         }
 
