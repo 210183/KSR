@@ -30,8 +30,8 @@ namespace ConsoleApp
             //Classification(text);
 
             var dataReader = new DataSamplesReader();
-            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm");
-
+            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm", "places");
+            var sam = samples.Last();
             Console.Read();
         }
 
