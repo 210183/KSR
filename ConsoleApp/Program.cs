@@ -35,6 +35,9 @@ namespace ConsoleApp
             var sam = samples.First();
             var filter = new StopWordsFilter(new List<string>{"a", "to", "in", "and", "of", ","});
             var filtered = filter.Filter(sam.Value.Body).ToList();
+            var stemmer = new PorterStemmer();
+            var stemmed = filtered.Select(w => stemmer.StemWord(w)).ToList();
+            stemmed.ForEach(Console.WriteLine);
             Console.Read();
         }
 
