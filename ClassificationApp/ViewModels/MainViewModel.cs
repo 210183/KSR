@@ -1,6 +1,7 @@
 ﻿using ClassificationApp.Base;
 using FileSamplesRead;
 using FileSamplesRead.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,7 +84,7 @@ namespace ClassificationApp.ViewModels
             folderDialog.ShowDialog();
             DirectoryFilePath = folderDialog.SelectedPath;
 
-            _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == "sgm").ToList();
+            _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
             FilesInDirectory = _listOfFiles.Count;
 
         }
@@ -92,9 +93,15 @@ namespace ClassificationApp.ViewModels
         {
             var dataReader = new DataSamplesReader();
             _listOfRawSamples = new List<RawSample>();
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Formatting = Formatting.Indented;
             foreach (string path in _listOfFiles)
             {
                 _listOfRawSamples = dataReader.ReadAllSamples(path, LabelName);
+                using (StreamWriter file = File.CreateText(Path.ChangeExtension(path, "json")))
+                {
+                    serializer.Serialize(file, _listOfRawSamples);
+                }
             }
         }
 
