@@ -9,5 +9,5 @@
 -	-	- choose k for KNN, cold-start number of samples
 -	-	- click classify
 -	-	- show classification results
-- read labels from file
+- [V] read labels from file
 - preprocessing
