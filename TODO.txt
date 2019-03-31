@@ -10,4 +10,4 @@
 -	-	- click classify
 -	-	- show classification results
 - [V] read labels from file
-- preprocessing
+- [partially] preprocessing
