@@ -4,7 +4,9 @@ using Classification;
 using Classification.Metrics;
 using Core.Models;
 using Core.Models.Concrete;
+using DataPreprocessing;
 using FileSamplesRead;
+using KeywordsExtraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +29,20 @@ namespace ConsoleApp
             investment or planned output.
             Soviet Soviet Soviet";
 
+            var filter = new StopWordsFilter(new List<string>{"a", "to", "in", "and", "of", ","});
+            var stemmer = new PorterStemmer();
             //Classification(text);
 
             var dataReader = new DataSamplesReader();
-            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm");
+            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm", "places");
+            var filtered = samples
+                .Select(s => (s.Labels, filter.Filter(s.Value.Body)))
+                //.Select(f => (f.Item1,
+                //        f.Item2
+                //        .Select(w => stemmer.StemWord(w))))
+                .ToList();
+
+            KeywordExtractor.Extract(filtered);
 
             Console.Read();
         }

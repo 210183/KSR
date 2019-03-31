@@ -61,9 +61,17 @@
       <Project>{BCD16D1D-A813-4FFD-BC1A-EB56C3276BD3}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataPreprocessing\DataPreprocessing.csproj">
+      <Project>{4C8713F8-DE49-479D-9E7F-BB7BBF94E3C8}</Project>
+      <Name>DataPreprocessing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FileSamplesRead\FileSamplesRead.csproj">
       <Project>{B5EDD902-24DC-4E3B-8892-9FAA5E422EC6}</Project>
       <Name>FileSamplesRead</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\KeywordsExtraction\KeywordsExtraction.csproj">
+      <Project>{F2D89781-2308-47D3-9F80-4E2357EAA9A2}</Project>
+      <Name>KeywordsExtraction</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

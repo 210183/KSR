@@ -10,6 +10,15 @@ namespace FileSamplesRead.Models
             Labels = labels;
         }
 
+        public RawSample(RawSample sample, string newBody)
+        {
+            Value = new ArticleSample(
+                sample.Value.Title,
+                sample.Value.Dateline,
+                newBody);
+            Labels = sample.Labels;
+        }
+
         public ArticleSample Value { get; }
         public LabelsCollection Labels { get; }
     }
