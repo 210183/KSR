@@ -14,7 +14,7 @@ namespace DataPreprocessing
         }
 
         public IEnumerable<string> Filter(string input)
-            => input.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            => input.Split(new[] { ' ', '\t', '\r', '\n', ',', ';', '.'}, StringSplitOptions.RemoveEmptyEntries)
                 .Where(w => !_stopWordsSet.Contains(w) && w.Length > 1);
         
     }
