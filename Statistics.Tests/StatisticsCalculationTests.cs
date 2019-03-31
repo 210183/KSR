@@ -25,6 +25,12 @@ namespace Statistics.Tests
         {
             return Calculator.CalculateRecall(matrix);
         }
+
+        [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.SpecificitySources))]
+        public double CalculateSpecificityTest(ConfusionMatrix matrix)
+        {
+            return Calculator.CalculateSpecificity(matrix);
+        }
     }
 
     public class TestCaseSource
@@ -68,6 +74,16 @@ namespace Statistics.Tests
                 yield return tc1.SetName($"Recall {tc1.TestName}").Returns(1d);
                 yield return tc2.SetName($"Recall {tc2.TestName}").Returns(0.75d);
                 yield return tc3.SetName($"Recall {tc3.TestName}").Returns(0d);
+            }
+        }
+
+        public static IEnumerable SpecificitySources
+        {
+            get
+            {
+                yield return tc1.SetName($"Specificity {tc1.TestName}").Returns(1d);
+                yield return tc2.SetName($"Specificity {tc2.TestName}").Returns(0.75d);
+                yield return tc3.SetName($"Specificity {tc3.TestName}").Returns(0d);
             }
         }
     }
