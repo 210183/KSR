@@ -1,14 +1,11 @@
-﻿using System;
+﻿using ClassificationApp.Base;
+using FileSamplesRead;
+using FileSamplesRead.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using ClassificationApp.Base;
-using FileSamplesRead;
-using FileSamplesRead.Models;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace ClassificationApp.ViewModels
 {
@@ -97,7 +94,7 @@ namespace ClassificationApp.ViewModels
             _listOfRawSamples = new List<RawSample>();
             foreach (string path in _listOfFiles)
             {
-                _listOfRawSamples = dataReader.ReadAllSamples(path);
+                _listOfRawSamples = dataReader.ReadAllSamples(path, LabelName);
             }
         }
 
