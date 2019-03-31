@@ -1,0 +1,5 @@
+- calculate specificity
+- UI
+-	-	
+-	-	
+- read labels from file
