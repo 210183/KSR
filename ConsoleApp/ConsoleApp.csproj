@@ -69,6 +69,10 @@
       <Project>{B5EDD902-24DC-4E3B-8892-9FAA5E422EC6}</Project>
       <Name>FileSamplesRead</Name>
     </ProjectReference>
+    <ProjectReference Include="..\KeywordsExtraction\KeywordsExtraction.csproj">
+      <Project>{F2D89781-2308-47D3-9F80-4E2357EAA9A2}</Project>
+      <Name>KeywordsExtraction</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
