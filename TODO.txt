@@ -1,5 +1,12 @@
 - calculate specificity
 - UI
--	-	
--	-	
+-	- window1: 
+-	-	- point to directory with files (seprate window ? )
+-	-	- click load files -> show how many samples found
+-	-	- choose what percent of files are for learning/tests
+-	-	- choose extractor type, write label name (places, ...)
+-	-	- click extract, ev. allow to see data samples vectors
+-	-	- choose k for KNN, cold-start number of samples
+-	-	- click classify
+-	-	- show classification results
 - read labels from file
