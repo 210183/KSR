@@ -33,8 +33,7 @@ namespace FileSamplesRead
                                 labels = new List<Label>();
                                 while (reader.Read())
                                 {
-                                    while (reader.Name.ToUpperInvariant() == "D"
-                                           || reader.Name.ToUpperInvariant() == "/D")
+                                    while (reader.Name.ToUpperInvariant() == "D")
                                     {
                                         reader.Read();
                                     }
