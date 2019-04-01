@@ -1,4 +1,7 @@
-﻿using ClassificationApp.Base;
+﻿using AttributesExtraction;
+using ClassificationApp.Base;
+using ClassificationApp.Views;
+using Core.Models.Concrete;
 using FileSamplesRead;
 using FileSamplesRead.Models;
 using Newtonsoft.Json;
@@ -7,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-
+using Label = Core.Models.Label;
 namespace ClassificationApp.ViewModels
 {
     class MainViewModel : BindableBase
@@ -16,11 +19,20 @@ namespace ClassificationApp.ViewModels
         private string _labelName;
         private int _nearestNeighboursNumber;
         private int _coldStartSamples;
-        //private ExtractorType _extractorType;
+        private ExtractorType _extractorType;
         private string _directoryFilePath;
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
+        private List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>
+        {
+            new ClassifiedDataSample(new OrderedAttributes(new List<double>{1}, new List<string>{"test"}), 
+                new LabelsCollection(new List<Label> {new Label("Helm's Deep")}),
+                new LabelsCollection(new List<Label>{new Label("Minas Tirith")})),
+            new ClassifiedDataSample(new OrderedAttributes(new List<double>{1}, new List<string>{"test"}),
+                new LabelsCollection(new List<Label>{new Label("Minas Tirith")}),
+                new LabelsCollection(new List<Label> {new Label("Minas Tirith") })),
+        };
 
         #region observable props
         public decimal PercentageOfLearningFiles
@@ -86,7 +98,6 @@ namespace ClassificationApp.ViewModels
 
             _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
             FilesInDirectory = _listOfFiles.Count;
-
         }
 
         private void LoadFiles()
@@ -117,10 +128,11 @@ namespace ClassificationApp.ViewModels
 
         private void ShowResults()
         {
-            throw new NotImplementedException();
+            if (_listOfClassifiedSamples != null)
+            {
+                ResultsWindow resultsWindow = new ResultsWindow(new ResultsViewModel(_listOfClassifiedSamples));
+                resultsWindow.Show();
+            }
         }
-
-
-
     }
 }

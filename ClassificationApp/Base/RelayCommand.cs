@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Media;
 using System.Windows.Input;
 
 namespace ClassificationApp.Base
@@ -45,6 +42,7 @@ namespace ClassificationApp.Base
         void ICommand.Execute(object parameter)
         {
             _targetExecuteMethod?.Invoke();
+            SystemSounds.Beep.Play();
         }
 
         #endregion ICommand Members
