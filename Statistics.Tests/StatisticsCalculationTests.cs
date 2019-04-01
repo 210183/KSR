@@ -2,6 +2,7 @@
 using Statistics.Calculation;
 using Statistics.Models;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Statistics.Tests
 {
@@ -36,15 +37,15 @@ namespace Statistics.Tests
     public class TestCaseSource
     {
         private static TestCaseData tc1 => 
-            new TestCaseData(MatrixSource.GetSingleCorrectlyAssigned())
+            new TestCaseData(MatrixSource.GetSingleCorrectlyAssigned(new List<string> { "Helm's Deep"}))
                 .SetName("Single correct");
 
         private static TestCaseData tc2 =>
-            new TestCaseData(MatrixSource.GetTwoOneIncorrectlyAssigned())
+            new TestCaseData(MatrixSource.GetTwoOneIncorrectlyAssigned(new List<string> { "Helm's Deep", "Minas Tirith" }))
                 .SetName("One of two incorrect");
 
         private static TestCaseData tc3 =>
-            new TestCaseData(MatrixSource.GetTwoIncorrectlyAssigned())
+            new TestCaseData(MatrixSource.GetTwoIncorrectlyAssigned(new List<string> { "Helm's Deep", "Minas Tirith" }))
                 .SetName("Two incorrect");
 
         public static IEnumerable AccuracySources

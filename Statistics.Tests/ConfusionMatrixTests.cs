@@ -24,7 +24,7 @@ namespace Statistics.Tests
                 },
             };
 
-            _expected = MatrixSource.GetSingleCorrectlyAssigned();
+            _expected = MatrixSource.GetSingleCorrectlyAssigned(new List<string>{ "Helm's Deep"});
 
             Then(classified);
         }
@@ -46,7 +46,7 @@ namespace Statistics.Tests
                 },
             };
 
-            _expected = MatrixSource.GetTwoIncorrectlyAssigned();
+            _expected = MatrixSource.GetTwoIncorrectlyAssigned(new List<string> { "Helm's Deep", "Minas Tirith" });
 
             Then(classified);
         }
@@ -68,7 +68,7 @@ namespace Statistics.Tests
                 },
             };
 
-            _expected = MatrixSource.GetTwoOneIncorrectlyAssigned();
+            _expected = MatrixSource.GetTwoOneIncorrectlyAssigned(new List<string> { "Helm's Deep", "Minas Tirith" });
 
             Then(classified);
         }
