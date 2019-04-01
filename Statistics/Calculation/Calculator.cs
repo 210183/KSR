@@ -40,7 +40,7 @@ namespace Statistics.Calculation
                 ]++;
             }
 
-            return new ConfusionMatrix(result);
+            return new ConfusionMatrix(result, uniqueLabels);
         }
 
         public static double CalculateAccuracy(ConfusionMatrix matrix) 

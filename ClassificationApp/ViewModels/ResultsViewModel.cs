@@ -7,7 +7,7 @@ namespace ClassificationApp.ViewModels
 {
     public class ResultsViewModel
     {
-        private ConfusionMatrix _confusionMatrix;
+        private string[][] _confusionMatrixTable;
         private double _accuracy;
         private double _precision;
         private double _specificity;
@@ -15,11 +15,12 @@ namespace ClassificationApp.ViewModels
 
         public ResultsViewModel(IReadOnlyList<IClassifiedDataSample> classified)
         {
-            _confusionMatrix = Calculator.CalculateConfusionMatrix(classified);
-            _accuracy = Calculator.CalculateAccuracy(Matrix);
-            _precision = Calculator.CalculatePrecision(Matrix);
-            _specificity = Calculator.CalculateSpecificity(Matrix);
-            _recall = Calculator.CalculateRecall(Matrix);
+            var confusionMatrix = Calculator.CalculateConfusionMatrix(classified);
+            _accuracy = Calculator.CalculateAccuracy(confusionMatrix);
+            _precision = Calculator.CalculatePrecision(confusionMatrix);
+            _specificity = Calculator.CalculateSpecificity(confusionMatrix);
+            _recall = Calculator.CalculateRecall(confusionMatrix);
+            StringifyMatrix(confusionMatrix);
         }
 
         public double Recall
@@ -42,9 +43,34 @@ namespace ClassificationApp.ViewModels
             get { return _accuracy; }
         }
 
-        public ConfusionMatrix Matrix
+        public string[][] ConfusionMatrixTable
         {
-            get { return _confusionMatrix; }
+            get { return _confusionMatrixTable; }
+        }
+
+        private void StringifyMatrix(ConfusionMatrix matrix)
+        {
+            _confusionMatrixTable = new string[matrix.Value.RowCount+1][];
+            ConfusionMatrixTable[0] = new string[matrix.Value.ColumnCount + 1];
+            ConfusionMatrixTable[0][0] = "";
+
+            for (int i = 1; i < matrix.Value.RowCount+1; i++)
+            {
+                ConfusionMatrixTable[i] = new string[matrix.Value.ColumnCount+1];
+                for (int j = 1; j < matrix.Value.ColumnCount+1; j++)
+                {
+                    ConfusionMatrixTable[i][j] = matrix.Value[i-1,j-1].ToString();
+                }
+            }
+
+            for (int i = 1; i < matrix.Value.RowCount+1; i++)
+            {
+                ConfusionMatrixTable[0][i] = matrix.Labels[i-1];
+            }
+            for (int i = 1; i < matrix.Value.RowCount + 1; i++)
+            {
+                ConfusionMatrixTable[i][0] = matrix.Labels[i-1];
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Label = Core.Models.Label;
+
 namespace ClassificationApp.ViewModels
 {
     class MainViewModel : BindableBase
@@ -31,7 +32,7 @@ namespace ClassificationApp.ViewModels
                 new LabelsCollection(new List<Label>{new Label("Minas Tirith")})),
             new ClassifiedDataSample(new OrderedAttributes(new List<double>{1}, new List<string>{"test"}),
                 new LabelsCollection(new List<Label>{new Label("Minas Tirith")}),
-                new LabelsCollection(new List<Label> {new Label("Minas Tirith") })),
+                new LabelsCollection(new List<Label> {new Label("Minas Tirith") }))
         };
 
         #region observable props
