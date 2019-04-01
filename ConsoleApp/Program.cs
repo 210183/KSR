@@ -34,7 +34,7 @@ namespace ConsoleApp
             //Classification(text);
 
             var dataReader = new DataSamplesReader();
-            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters\\reut2-001.sgm", "places");
+            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters_przetworzone\\reut2-004.sgm", "places");
             var filtered = samples
                 .Select(s => (s.Labels, filter.Filter(s.Value.Body)))
                 //.Select(f => (f.Item1,
