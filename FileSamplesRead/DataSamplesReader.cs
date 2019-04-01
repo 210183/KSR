@@ -25,8 +25,6 @@ namespace FileSamplesRead
                 List<Label> labels = new List<Label>();
                 using (var reader = new XmlTextReader(filePath))
                 {
-                    int counter = 0;
-                    int hundreds = 0;
                     while (reader.Read())
                     {
                         if (reader.NodeType == XmlNodeType.Element)
@@ -66,18 +64,7 @@ namespace FileSamplesRead
                                 samples.Add(new RawSample(
                                     new ArticleSample(title, dateline, body), 
                                     new LabelsCollection(labels)));
-                                if (title.StartsWith("USDA REPORTS 10.572 MLN"))
-                                {
-                                    Debug.WriteLine("ttts");
-                                }
-                                counter++;
                             }
-                        }
-
-                        if (samples.Count > 895)
-                        {
-                            counter = 0;
-                            hundreds++;
                         }
                     }
                 }
