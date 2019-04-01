@@ -2,6 +2,7 @@
 using AttributesExtraction.Extractors;
 using Classification;
 using Classification.Metrics;
+using Core;
 using Core.Models;
 using Core.Models.Concrete;
 using DataPreprocessing;
@@ -29,7 +30,7 @@ namespace ConsoleApp
             investment or planned output.
             Soviet Soviet Soviet";
 
-            var filter = new StopWordsFilter(new List<string>{"a", "to", "in", "and", "of", ","});
+            var filter = new StopWordsFilter(WellKnownNames.StopWords);
             var stemmer = new PorterStemmer();
             //Classification(text);
 

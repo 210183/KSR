@@ -4,7 +4,6 @@ using FileSamplesRead.Exceptions;
 using FileSamplesRead.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -57,13 +56,16 @@ namespace FileSamplesRead
                                 string title = reader.Value;
                                 string dateline = ReadTextElement(reader, "dateline");
                                 string body = ReadTextElement(reader, "body");
-                                if (!labels.Any())
+                                if (title != null && dateline != null && body != null)
                                 {
-                                    labels.Add(new Label(Core.WellKnownNames.UnknownLabelName));
+                                    if (!labels.Any())
+                                    {
+                                        labels.Add(new Label(Core.WellKnownNames.UnknownLabelName));
+                                    }
+                                    samples.Add(new RawSample(
+                                        new ArticleSample(title, dateline, body), 
+                                        new LabelsCollection(labels)));
                                 }
-                                samples.Add(new RawSample(
-                                    new ArticleSample(title, dateline, body), 
-                                    new LabelsCollection(labels)));
                             }
                         }
                     }
