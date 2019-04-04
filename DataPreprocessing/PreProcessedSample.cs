@@ -7,14 +7,14 @@ namespace DataPreprocessing
 {
     public class PreProcessedSample
     {
-        public PreProcessedSample(LabelsCollection labelsCollection, List<string> words)
+        public PreProcessedSample(LabelsCollection labels, PreProcessedArticleSample preProcessedArticleSample)
         {
-            LabelsCollection = labelsCollection ?? throw new ArgumentNullException(nameof(labelsCollection));
-            Words = words ?? throw new ArgumentNullException(nameof(words));
+            Labels = labels ?? throw new ArgumentNullException(nameof(labels));
+            PreProcessedArticleSample = preProcessedArticleSample ?? throw new ArgumentNullException(nameof(preProcessedArticleSample));
         }
 
-        public LabelsCollection LabelsCollection { get; set; }
-        public List<string> Words { get; set; }
+        public LabelsCollection Labels { get; set; }
+        public PreProcessedArticleSample PreProcessedArticleSample { get; set; }
 
 
     }

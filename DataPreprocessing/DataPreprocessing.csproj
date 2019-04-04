@@ -8,4 +8,19 @@
     <ProjectReference Include="..\FileSamplesRead\FileSamplesRead.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="LemmaSharp">
+      <HintPath>LemmaGen\LemmaSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="LemmaSharpPrebuilt">
+      <HintPath>LemmaGen\LemmaSharpPrebuilt.dll</HintPath>
+    </Reference>
+    <Reference Include="LemmaSharpPrebuiltCompact">
+      <HintPath>LemmaGen\LemmaSharpPrebuiltCompact.dll</HintPath>
+    </Reference>
+    <Reference Include="Lzma#">
+      <HintPath>LemmaGen\Lzma#.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

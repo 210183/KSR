@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FileSamplesRead.Models;
 
 namespace DataPreprocessing
 {
@@ -13,10 +14,17 @@ namespace DataPreprocessing
             _stopWordsSet = new HashSet<string>(stopWords, StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public IEnumerable<string> Filter(string input)
-            => input.Split(new[] { ' ', '\t', '\r', '\n', ',', ';', '.'}, StringSplitOptions.RemoveEmptyEntries)
-                .Where(w => !_stopWordsSet.Contains(w) && w.Length > 1);
-        
+        public PreProcessedSample Filter(RawSample input)
+            => new PreProcessedSample(
+                input.Labels,
+                new PreProcessedArticleSample(
+                    input.Value.Title,
+                    input.Value.Dateline,
+                    input.Value.Body.Split(new[] { ' ', '\t', '\r', '\n', ',', ';', '.' },
+                            StringSplitOptions.RemoveEmptyEntries)
+                            .Where(w => !_stopWordsSet.Contains(w) && w.Length > 1).ToList()
+                    ));
+
     }
 
 }

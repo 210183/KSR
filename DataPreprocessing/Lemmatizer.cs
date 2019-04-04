@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using FileSamplesRead.Models;
+using LemmaSharp;
 
 namespace DataPreprocessing
 {
-    static class Lemmatizer
+    public class Lemmatizer
     {
-        public List<PreProcessedSample> LemmatizeSet(List<PreProcessedSample> sample)
-        {
-            throw new NotImplementedException();
-        }
+        private ILemmatizer lmtz = new LemmatizerPrebuiltCompact(LemmaSharp.LanguagePrebuilt.English);
 
-        private string LemmatizeOne(string word)
-        {
-            throw new NotImplementedException();
-        }
+        public PreProcessedSample LemmatizeSample(PreProcessedSample sample)
+             => new PreProcessedSample(sample.Labels,
+                new PreProcessedArticleSample(
+                    sample.PreProcessedArticleSample.Title,
+                    sample.PreProcessedArticleSample.Dateline,
+                    sample.PreProcessedArticleSample.Body.Select(LemmatizeOne).ToList()
+                    ));
 
+        public string LemmatizeOne(string word) => lmtz.Lemmatize(word.ToLower());
     }
 }
