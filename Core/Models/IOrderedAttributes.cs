@@ -2,9 +2,8 @@
 
 namespace Core.Models
 {
-    public interface IOrderedAttributes
+    public interface IAttributesDictionary
     {
-        IReadOnlyList<string> Names { get; }
-        IReadOnlyList<double> Values { get; }
+        IReadOnlyDictionary<string, double> Values { get; }
     }
 }

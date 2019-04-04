@@ -1,26 +1,15 @@
-﻿using Core.Exceptions;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Core.Models.Concrete
 {
-    public class OrderedAttributes : IOrderedAttributes
+    public class AttributesDictionary : IAttributesDictionary
     {
-        public OrderedAttributes(IReadOnlyList<double> attributes, IReadOnlyList<string> attributesNamesInOrder)
+        public AttributesDictionary(IReadOnlyDictionary<string, double> attributes)
         {
-            if (attributes?.Any() == true
-                && attributesNamesInOrder != null)
-            {
-                Names = attributesNamesInOrder;
-                Values = attributes;
-            }
-            else
-            {
-                throw new AttributesException("Non empty, named attributes vector is required. ");
-            }
+            Values = attributes ?? throw new ArgumentNullException(nameof(attributes));
         }
 
-        public IReadOnlyList<string> Names { get; }
-        public IReadOnlyList<double> Values { get; }
+        public IReadOnlyDictionary<string, double> Values { get; }
     }
 }

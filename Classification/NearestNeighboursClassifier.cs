@@ -8,7 +8,7 @@ namespace Classification
     public static class NearestNeighboursClassifier
     {
         public static DataSample Classify(
-            OrderedAttributes newSampleAttributes,
+            AttributesDictionary newSampleAttributes,
             SamplesCollection classifiedSamples,
             int neighboursCount,
             IMetric metric)

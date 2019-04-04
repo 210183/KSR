@@ -28,15 +28,15 @@ namespace Statistics.Calculation
 
             var indexDictionary = Enumerable.Range(0, numberOfClasses)
                 .Zip(uniqueLabels, (i, label) => (i, label))
-                .ToDictionary(v => v.Item2, v => v.Item1);
+                .ToDictionary(v => v.label, v => v.i);
 
             Matrix<double> result = Matrix<double>.Build.Dense(numberOfClasses, numberOfClasses);
 
-            foreach (var sample in reducedSamples)
+            foreach (var (assigned, actual) in reducedSamples)
             {
                 result[
-                    indexDictionary[sample.actual.Name],
-                    indexDictionary[sample.assigned.Name]
+                    indexDictionary[actual.Name],
+                    indexDictionary[assigned.Name]
                 ]++;
             }
 

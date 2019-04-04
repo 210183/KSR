@@ -4,6 +4,6 @@ namespace Classification.Metrics
 {
     public interface IMetric
     {
-        double Distance(IReadOnlyList<double> first, IReadOnlyList<double> second);
+        double Distance(IReadOnlyDictionary<string, double> first, IReadOnlyDictionary<string, double> second);
     }
 }
