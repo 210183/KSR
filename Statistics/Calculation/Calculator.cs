@@ -21,6 +21,8 @@ namespace Statistics.Calculation
 
             var uniqueLabels = reducedSamples
                 .Select(d => d.actual.Name)
+                .Concat(reducedSamples
+                    .Select(d => d.assigned.Name))
                 .Distinct()
                 .ToList();
             uniqueLabels.Sort();

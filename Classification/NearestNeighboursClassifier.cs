@@ -7,8 +7,8 @@ namespace Classification
 {
     public static class NearestNeighboursClassifier
     {
-        public static DataSample Classify(
-            AttributesDictionary newSampleAttributes,
+        public static ClassifiedDataSample Classify(
+            DataSample newSample,
             SamplesCollection classifiedSamples,
             int neighboursCount,
             IMetric metric)
@@ -18,7 +18,7 @@ namespace Classification
                 .Select(s => new
                 {
                     labels = s.Labels,
-                    distane = metric.Distance(s.Attributes.Values, newSampleAttributes.Values)
+                    distane = metric.Distance(s.Attributes.Values, newSample.Attributes.Values)
                 })
                 .ToList();
 
@@ -28,8 +28,9 @@ namespace Classification
 
             //TODO: implement k usage
 
-            return new DataSample(
-                newSampleAttributes,
+            return new ClassifiedDataSample(
+                newSample.Attributes,
+                newSample.Labels,
                 distances.First().labels
                 );
         }

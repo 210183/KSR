@@ -122,9 +122,17 @@
       <Project>{5AA638DB-143B-4734-9F16-7252BB917464}</Project>
       <Name>AttributesExtraction</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Classification\Classification.csproj">
+      <Project>{40DF815D-A411-4464-8A96-D8A2A1E3C66D}</Project>
+      <Name>Classification</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{BCD16D1D-A813-4FFD-BC1A-EB56C3276BD3}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataPreprocessing\DataPreprocessing.csproj">
+      <Project>{4C8713F8-DE49-479D-9E7F-BB7BBF94E3C8}</Project>
+      <Name>DataPreprocessing</Name>
     </ProjectReference>
     <ProjectReference Include="..\FileSamplesRead\FileSamplesRead.csproj">
       <Project>{B5EDD902-24DC-4E3B-8892-9FAA5E422EC6}</Project>
@@ -134,6 +142,10 @@
       <Project>{8CBE7823-447E-4AD6-ABF0-C3087FFF8FE2}</Project>
       <Name>Statistics</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="ExternalLibrary\DataGrid2DLibrary.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

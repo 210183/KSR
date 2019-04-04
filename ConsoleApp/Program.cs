@@ -1,10 +1,8 @@
 ﻿using Core;
 using DataPreprocessing;
 using FileSamplesRead;
-using KeywordsExtraction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ConsoleApp
 {

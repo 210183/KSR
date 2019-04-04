@@ -1,7 +1,13 @@
 ﻿using AttributesExtraction;
+using AttributesExtraction.Extractors;
+using Classification;
+using Classification.Metrics;
 using ClassificationApp.Base;
 using ClassificationApp.Views;
+using Core;
+using Core.Models;
 using Core.Models.Concrete;
+using DataPreprocessing;
 using FileSamplesRead;
 using FileSamplesRead.Models;
 using Newtonsoft.Json;
@@ -13,27 +19,26 @@ using System.Windows.Forms;
 
 namespace ClassificationApp.ViewModels
 {
-    class MainViewModel : BindableBase
+    internal class MainViewModel : BindableBase
     {
         private decimal _percentageOfLearningFiles;
-        private string _labelName;
-        private int _nearestNeighboursNumber;
-        private int _coldStartSamples;
-        private ExtractorType _extractorType;
-        private string _directoryFilePath;
+        private string _labelName = "places";
+        private int _nearestNeighboursNumber = 2;
+        private int _coldStartSamples = 100;
+        private readonly ExtractorType _extractorType;
+        private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
+        private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
+        private SamplesCollection _listOfDataSamples;
 
-        private List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
-        //{
-        //    new ClassifiedDataSample(new AttributesDictionary(new List<double>{1}, new List<string>{"test"}), 
-        //        new LabelsCollection(new List<Label> {new Label("Helm's Deep")}),
-        //        new LabelsCollection(new List<Label>{new Label("Minas Tirith")})),
-        //    new ClassifiedDataSample(new AttributesDictionary(new List<double>{1}, new List<string>{"test"}),
-        //        new LabelsCollection(new List<Label>{new Label("Minas Tirith")}),
-        //        new LabelsCollection(new List<Label> {new Label("Minas Tirith") }))
-        //};
+        private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
+
+        private StopWordsFilter _stopWordsFilter = new StopWordsFilter(WellKnownNames.StopWords);
+        private Lemmatizer _lemmatizer = new Lemmatizer();
+        private IAttributeExtractor _extractor;
+        private IMetric _metric = new ManhattanMetric();
 
         #region observable props
         public decimal PercentageOfLearningFiles
@@ -96,35 +101,54 @@ namespace ClassificationApp.ViewModels
             FolderBrowserDialog folderDialog = new FolderBrowserDialog();
             folderDialog.ShowDialog();
             DirectoryFilePath = folderDialog.SelectedPath;
-
-            _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
-            FilesInDirectory = _listOfFiles.Count;
         }
 
         private void LoadFiles()
         {
+            _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
+            FilesInDirectory = _listOfFiles.Count;
             var dataReader = new DataSamplesReader();
             _listOfRawSamples = new List<RawSample>();
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Formatting = Formatting.Indented;
+            JsonSerializer serializer = new JsonSerializer
+            {
+                Formatting = Formatting.Indented
+            };
             foreach (string path in _listOfFiles)
             {
-                _listOfRawSamples = dataReader.ReadAllSamples(path, LabelName);
+                _listOfRawSamples.AddRange(dataReader.ReadAllSamples(path, LabelName));
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(path, "json")))
                 {
                     serializer.Serialize(file, _listOfRawSamples);
                 }
             }
+            foreach (var sample in _listOfRawSamples
+                .Take(_listOfRawSamples.Count > 1000 ? 1000 : _listOfRawSamples.Count))
+            {
+                _listOfPreProcessedSamples.Add(_lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(sample)));
+            }
         }
 
         private void ExtractFromSamples()
         {
-            throw new NotImplementedException();
+            _extractor = new TFTExtractor();
+            _listOfDataSamples = new SamplesCollection(_extractor.Extract(_listOfPreProcessedSamples));
         }
 
         private void ClassifySamples()
         {
-            throw new NotImplementedException();
+            var randomizer = new Random();
+            var learnedData = new SamplesCollection(_listOfDataSamples.Samples
+                .OrderBy(s => randomizer.Next())
+                .Take(_coldStartSamples).ToList());
+            _listOfDataSamples.Samples.Skip(_coldStartSamples)
+                .ToList()
+                .ForEach(s => _listOfClassifiedSamples.Add(
+                    NearestNeighboursClassifier.Classify(
+                        s,
+                        learnedData,
+                        _nearestNeighboursNumber,
+                        _metric
+                )));
         }
 
         private void ShowResults()

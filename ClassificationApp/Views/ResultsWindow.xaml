@@ -26,20 +26,20 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Text="Accuracy" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0" ></TextBlock>
-        <TextBlock Text="{Binding Accuracy, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="0"/>
+        <TextBlock Text="{Binding Accuracy, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"  Grid.Row="0" Grid.Column="0"/>
 
         <TextBlock Text="Recall" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1" ></TextBlock>
-        <TextBlock Text="{Binding Recall, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="1"/>
+        <TextBlock Text="{Binding Recall, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"  Grid.Row="0" Grid.Column="1"/>
 
         <TextBlock Text="Precision" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" ></TextBlock>
-        <TextBlock Text="{Binding Precision, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="2"/>
+        <TextBlock Text="{Binding Precision, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"  Grid.Row="0" Grid.Column="2"/>
 
         <TextBlock Text="Specificity" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.Column="3" ></TextBlock>
-        <TextBlock Text="{Binding Specificity, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="3"/>
+        <TextBlock Text="{Binding Specificity, Mode = OneWay}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"  Grid.Row="0" Grid.Column="3"/>
 
         <dg2d:DataGrid2D UseModifiedDataGridStyle="True" 
                          Grid.Column="0" Grid.ColumnSpan="4"  Grid.Row="1" Grid.RowSpan="4" 
-                         CanUserReorderColumns="False" CanUserSortColumns="False"
+                         CanUserReorderColumns="False" CanUserSortColumns="False" AreRowDetailsFrozen="True" 
                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                          HorizontalAlignment="Left" VerticalAlignment="Center"
                          Background="DimGray" AlternatingRowBackground="DarkGray" HeadersVisibility="None"
