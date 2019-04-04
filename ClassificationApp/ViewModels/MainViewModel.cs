@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Label = Core.Models.Label;
 
 namespace ClassificationApp.ViewModels
 {
@@ -25,15 +24,16 @@ namespace ClassificationApp.ViewModels
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
-        private List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>
-        {
-            new ClassifiedDataSample(new OrderedAttributes(new List<double>{1}, new List<string>{"test"}), 
-                new LabelsCollection(new List<Label> {new Label("Helm's Deep")}),
-                new LabelsCollection(new List<Label>{new Label("Minas Tirith")})),
-            new ClassifiedDataSample(new OrderedAttributes(new List<double>{1}, new List<string>{"test"}),
-                new LabelsCollection(new List<Label>{new Label("Minas Tirith")}),
-                new LabelsCollection(new List<Label> {new Label("Minas Tirith") }))
-        };
+
+        private List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
+        //{
+        //    new ClassifiedDataSample(new AttributesDictionary(new List<double>{1}, new List<string>{"test"}), 
+        //        new LabelsCollection(new List<Label> {new Label("Helm's Deep")}),
+        //        new LabelsCollection(new List<Label>{new Label("Minas Tirith")})),
+        //    new ClassifiedDataSample(new AttributesDictionary(new List<double>{1}, new List<string>{"test"}),
+        //        new LabelsCollection(new List<Label>{new Label("Minas Tirith")}),
+        //        new LabelsCollection(new List<Label> {new Label("Minas Tirith") }))
+        //};
 
         #region observable props
         public decimal PercentageOfLearningFiles

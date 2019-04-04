@@ -1,10 +1,4 @@
-﻿using AttributesExtraction;
-using AttributesExtraction.Extractors;
-using Classification;
-using Classification.Metrics;
-using Core;
-using Core.Models;
-using Core.Models.Concrete;
+﻿using Core;
 using DataPreprocessing;
 using FileSamplesRead;
 using KeywordsExtraction;
@@ -35,7 +29,7 @@ namespace ConsoleApp
             //Classification(text);
 
             var dataReader = new DataSamplesReader();
-            var samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters_przetworzone\\reut2-004.sgm", "places");
+            List<FileSamplesRead.Models.RawSample> samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters_przetworzone\\reut2-004.sgm", "places");
             var filtered = samples
                 .Select(s => (s.Labels, filter.Filter(s.Value.Body)))
                 //.Select(f => (f.Item1,
@@ -50,44 +44,44 @@ namespace ConsoleApp
 
         private static void Classification(string text)
         {
-            IAttributeExtractor extractor = new CountExtractor(
-                new List<string>()
-                {
-                    "Soviet"
-                },
-                "SovietCount");
+            //IAttributeExtractor extractor = new CountExtractor(
+            //    new List<string>()
+            //    {
+            //        "Soviet"
+            //    },
+            //    "SovietCount");
 
-            (string name, double attributeCount) = extractor.Extract(text.Split(null).ToList());
+            //(string name, double attributeCount) = extractor.Extract(text.Split(null).ToList());
 
-            var newClassifiedSample = NearestNeighboursClassifier.Classify(
-                new OrderedAttributes(
-                    new List<double> { attributeCount },
-                    new List<string> { name }),
-                new SamplesCollection(new List<DataSample>()
-                {
-                    new DataSample(
-                        new OrderedAttributes(
-                            new List<double>() {1},
-                            new List<string>() {"SovietCount"}
-                        ),
-                        new LabelsCollection(new List<Label>() {new Label("A bit soviet")})),
-                    new DataSample(
-                        new OrderedAttributes(
-                            new List<double> {2},
-                            new List<string> {"SovietCount"}
-                        ),
-                        new LabelsCollection(new List<Label> {new Label("More soviet")})),
-                    new DataSample(
-                        new OrderedAttributes(
-                            new List<double> {4},
-                            new List<string> {"SovietCount"}
-                        ),
-                        new LabelsCollection(new List<Label> {new Label("Любимый сын Матери России")}))
-                }),
-                4,
-                new ManhattanMetric()
-            );
-            newClassifiedSample.Labels.Values.Select(l => l.Name).ToList().ForEach(Console.WriteLine);
+            //var newClassifiedSample = NearestNeighboursClassifier.Classify(
+            //    new AttributesDictionary(
+            //        new List<double> { attributeCount },
+            //        new List<string> { name }),
+            //    new SamplesCollection(new List<DataSample>()
+            //    {
+            //        new DataSample(
+            //            new AttributesDictionary(
+            //                new List<double>() {1},
+            //                new List<string>() {"SovietCount"}
+            //            ),
+            //            new LabelsCollection(new List<Label>() {new Label("A bit soviet")})),
+            //        new DataSample(
+            //            new AttributesDictionary(
+            //                new List<double> {2},
+            //                new List<string> {"SovietCount"}
+            //            ),
+            //            new LabelsCollection(new List<Label> {new Label("More soviet")})),
+            //        new DataSample(
+            //            new AttributesDictionary(
+            //                new List<double> {4},
+            //                new List<string> {"SovietCount"}
+            //            ),
+            //            new LabelsCollection(new List<Label> {new Label("Любимый сын Матери России")}))
+            //    }),
+            //    4,
+            //    new ManhattanMetric()
+            //);
+            //newClassifiedSample.Labels.Values.Select(l => l.Name).ToList().ForEach(Console.WriteLine);
         }
     }
 }

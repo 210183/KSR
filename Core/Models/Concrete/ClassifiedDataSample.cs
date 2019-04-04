@@ -2,7 +2,7 @@
 {
     public class ClassifiedDataSample : DataSample, IClassifiedDataSample
     {
-        public ClassifiedDataSample(OrderedAttributes attributes, LabelsCollection labels, LabelsCollection assignedLabels) : base(attributes, labels)
+        public ClassifiedDataSample(AttributesDictionary attributes, LabelsCollection labels, LabelsCollection assignedLabels) : base(attributes, labels)
         {
             AssignedLabels = assignedLabels;
         }

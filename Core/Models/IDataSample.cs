@@ -4,7 +4,7 @@ namespace Core.Models
 {
     public interface IDataSample
     {
-        OrderedAttributes Attributes { get; }
+        AttributesDictionary Attributes { get; }
         LabelsCollection Labels { get; }
     }
 }

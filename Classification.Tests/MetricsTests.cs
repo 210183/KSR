@@ -17,13 +17,15 @@ namespace Classification.Tests
         {
             TestDistance(type,
                 correctDistance,
-                new List<double>
+                new Dictionary<string, double>()
                 {
-                    0, 0
+                    {"eald", 0},
+                    {"loquacious", 0},
                 },
-                new List<double>
+                new Dictionary<string, double>()
                 {
-                    0, 0
+                    {"eald", 0},
+                    {"loquacious", 0},
                 });
         }
 
@@ -34,13 +36,15 @@ namespace Classification.Tests
         {
             TestDistance(type,
                 correctDistance,
-                new List<double>
+                new Dictionary<string, double>()
                 {
-                    0, 0
+                    {"eald", 0},
+                    {"loquacious", 0},
                 },
-                new List<double>
+                new Dictionary<string, double>()
                 {
-                    3.1, -37.3
+                    {"eald", 3.1},
+                    {"loquacious", -37.3},
                 });
         }
 
@@ -51,20 +55,22 @@ namespace Classification.Tests
         {
             TestDistance(type,
                 correctDistance,
-                new List<double>
+                new Dictionary<string, double>()
                 {
-                    2, 4
+                    {"eald", 2},
+                    {"loquacious", 4},
                 },
-                new List<double>
+                new Dictionary<string, double>()
                 {
-                    -3, 5
+                    {"eald", -3},
+                    {"loquacious", 5},
                 });
         }
 
         private void TestDistance(MetricType type,
             double correctDistance,
-            IReadOnlyList<double> firstAttributes,
-            IReadOnlyList<double> secondAttributes)
+            IReadOnlyDictionary<string,double> firstAttributes,
+            IReadOnlyDictionary<string, double> secondAttributes)
         {
             With_Metric(type);
 

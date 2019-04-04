@@ -82,7 +82,7 @@ namespace Statistics.Tests
 
         internal class ClassifiedDataSampleMock : IClassifiedDataSample
         {
-            public OrderedAttributes Attributes { get; }
+            public AttributesDictionary Attributes { get; }
             public LabelsCollection Labels { get; set; }
             public LabelsCollection AssignedLabels { get; set; }
         }

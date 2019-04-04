@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Core.Models.Concrete;
+using DataPreprocessing;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AttributesExtraction.Extractors
@@ -16,10 +18,13 @@ namespace AttributesExtraction.Extractors
 
         }
 
-        public (string name, double count) Extract(List<string> words)
-        {
-            return (AttributeName, words.Count(w => KeyValues.Contains(w)));
-
-        }
+        public List<DataSample> Extract(List<PreProcessedSample> samples)
+            => samples.Select(s => new DataSample(
+                new AttributesDictionary(
+                    new Dictionary<string, double>
+                    {
+                        {AttributeName, s.Words.Count(w => KeyValues.Contains(w))}
+                    }),
+                s.LabelsCollection)).ToList();
     }
 }

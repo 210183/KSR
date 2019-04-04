@@ -6,10 +6,18 @@ namespace Classification.Metrics
 {
     public class ManhattanMetric : IMetric
     {
-        public double Distance(IReadOnlyList<double> first, IReadOnlyList<double> second)
+        public double Distance(IReadOnlyDictionary<string, double> first, IReadOnlyDictionary<string, double> second)
         {
-            return first
-                .Zip(second, (f, s) => Math.Abs(f - s))
+            return first.Keys
+                .ToList()
+                .Concat(second.Keys)
+                .Distinct()
+                .Select(k =>
+                {
+                    first.TryGetValue(k, out double f);
+                    second.TryGetValue(k, out double s);
+                    return Math.Abs(f - s);
+                })
                 .Sum();
         }
     }

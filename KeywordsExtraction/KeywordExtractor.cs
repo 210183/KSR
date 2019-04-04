@@ -33,14 +33,14 @@ namespace KeywordsExtraction
             using (var writer = new StreamWriter(new FileStream(Path.ChangeExtension(path, "words"), FileMode.OpenOrCreate)))
             {
                 writer.WriteLine("---- ----- ----");
-                foreach (var countedWord in words.Take(howManyToSave))
+                foreach (var (word, counter) in words.Take(howManyToSave))
                 {
-                    writer.WriteLine($"{countedWord.word} {countedWord.counter}");
+                    writer.WriteLine($"{word} {counter}");
                 }
                 writer.WriteLine("---- ----- ----");
-                foreach (var countedWord in words.Skip(words.Count - howManyToSave))
+                foreach (var (word, counter) in words.Skip(words.Count - howManyToSave))
                 {
-                    writer.WriteLine($"{countedWord.word} {countedWord.counter}");
+                    writer.WriteLine($"{word} {counter}");
                 }
             }
         }
