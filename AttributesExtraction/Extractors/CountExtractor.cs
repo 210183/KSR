@@ -13,8 +13,8 @@ namespace AttributesExtraction.Extractors
 
         public CountExtractor(List<string> keyValues, string attributeName)
         {
-            this.KeyValues = keyValues;
-            this.AttributeName = attributeName;
+            KeyValues = keyValues;
+            AttributeName = attributeName;
 
         }
 
