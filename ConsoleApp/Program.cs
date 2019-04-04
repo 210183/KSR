@@ -30,14 +30,14 @@ namespace ConsoleApp
 
             var dataReader = new DataSamplesReader();
             List<FileSamplesRead.Models.RawSample> samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters_przetworzone\\reut2-004.sgm", "places");
-            var filtered = samples
-                .Select(s => (s.Labels, filter.Filter(s.Value.Body)))
-                //.Select(f => (f.Item1,
-                //        f.Item2
-                //        .Select(w => stemmer.StemWord(w))))
-                .ToList();
+            //var filtered = samples
+            //    .Select(s => (s.Labels, filter.Filter(s.Value.Body)))
+            //    //.Select(f => (f.Item1,
+            //    //        f.Item2
+            //    //        .Select(w => stemmer.StemWord(w))))
+            //    .ToList();
 
-            KeywordExtractor.Extract(filtered);
+            //KeywordExtractor.Extract(filtered);
 
             Console.Read();
         }

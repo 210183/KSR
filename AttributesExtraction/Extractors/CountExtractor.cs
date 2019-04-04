@@ -23,8 +23,8 @@ namespace AttributesExtraction.Extractors
                 new AttributesDictionary(
                     new Dictionary<string, double>
                     {
-                        {AttributeName, s.Words.Count(w => KeyValues.Contains(w))}
+                        {AttributeName, s.PreProcessedArticleSample.Body.Count(w => KeyValues.Contains(w))}
                     }),
-                s.LabelsCollection)).ToList();
+                s.Labels)).ToList();
     }
 }

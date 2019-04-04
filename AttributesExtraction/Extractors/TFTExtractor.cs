@@ -10,9 +10,9 @@ namespace AttributesExtraction.Extractors
         public List<DataSample> Extract(List<PreProcessedSample> samples)
             => samples.Select(s => new DataSample(
                 new AttributesDictionary(
-                    s.Words
+                    s.PreProcessedArticleSample.Body
                         .GroupBy(w => w)
                         .ToDictionary(g => g.Key, g => (double)g.Count())),
-                s.LabelsCollection)).ToList();
+                s.Labels)).ToList();
     }
 }
