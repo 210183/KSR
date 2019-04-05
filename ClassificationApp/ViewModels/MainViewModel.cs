@@ -12,6 +12,7 @@ using FileSamplesRead;
 using FileSamplesRead.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,8 +33,11 @@ namespace ClassificationApp.ViewModels
         private List<RawSample> _listOfRawSamples;
         private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
         private SamplesCollection _listOfDataSamples;
+        private ConcurrentBag<DataSample> _concurrentBagOfDataSamples;
+        private bool _shouldUseJsonDataFile;
 
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
+        private readonly ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
 
         private StopWordsFilter _stopWordsFilter = new StopWordsFilter(WellKnownNames.StopWords);
         private Lemmatizer _lemmatizer = new Lemmatizer();
@@ -76,6 +80,12 @@ namespace ClassificationApp.ViewModels
             get => _filesInDirectory;
             private set => SetProperty(ref _filesInDirectory, value);
         }
+
+        public bool ShouldUseJsonDataFile
+        {
+            get => _shouldUseJsonDataFile;
+            set => SetProperty(ref _shouldUseJsonDataFile, value);
+        }
         #endregion
 
         #region Commands
@@ -84,6 +94,7 @@ namespace ClassificationApp.ViewModels
         public IRaiseCanExecuteCommand ExtractCommand { get; }
         public IRaiseCanExecuteCommand ClassifyCommand { get; }
         public IRaiseCanExecuteCommand ResultCommand { get; }
+        public IRaiseCanExecuteCommand ChangeUseJsonDataFile { get; }
         #endregion
 
         public MainViewModel()
@@ -93,6 +104,7 @@ namespace ClassificationApp.ViewModels
             ExtractCommand = new RelayCommand(ExtractFromSamples);
             ClassifyCommand = new RelayCommand(ClassifySamples);
             ResultCommand = new RelayCommand(ShowResults);
+            ChangeUseJsonDataFile = new RelayCommand(() => _shouldUseJsonDataFile = !_shouldUseJsonDataFile);
         }
 
 
@@ -105,57 +117,83 @@ namespace ClassificationApp.ViewModels
 
         private void LoadFiles()
         {
-            _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
-            FilesInDirectory = _listOfFiles.Count;
-            var dataReader = new DataSamplesReader();
-            _listOfRawSamples = new List<RawSample>();
-            JsonSerializer serializer = new JsonSerializer
+            _listOfPreProcessedSamples = new List<PreProcessedSample>();
+            if (ShouldUseJsonDataFile)
             {
-                Formatting = Formatting.Indented
-            };
-            foreach (string path in _listOfFiles)
-            {
-                _listOfRawSamples.AddRange(dataReader.ReadAllSamples(path, LabelName));
-                using (StreamWriter file = File.CreateText(Path.ChangeExtension(path, "json")))
+                JsonSerializer serializer = new JsonSerializer
                 {
-                    serializer.Serialize(file, _listOfRawSamples);
+                    Formatting = Formatting.Indented
+                };
+                using (JsonReader reader = new JsonTextReader(File.OpenText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json"))))
+                {
+                    _listOfPreProcessedSamples = serializer.Deserialize<List<PreProcessedSample>>(reader);
                 }
             }
-            foreach (var sample in _listOfRawSamples
-                .Take(_listOfRawSamples.Count > 1000 ? 1000 : _listOfRawSamples.Count))
+            else
             {
-                _listOfPreProcessedSamples.Add(_lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(sample)));
+                _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
+                FilesInDirectory = _listOfFiles.Count;
+                _listOfRawSamples = new List<RawSample>();
+                foreach (string path in _listOfFiles)
+                {
+                    _listOfRawSamples.AddRange(DataSamplesReader.ReadAllSamples(path, LabelName));
+                }
+                foreach (var sample in _listOfRawSamples)
+                //.Take(_listOfRawSamples.Count > 1000 ? 1000 : _listOfRawSamples.Count))
+                {
+                    _listOfPreProcessedSamples.Add(_lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(sample)));
+                }
+                JsonSerializer serializer = new JsonSerializer
+                {
+                    Formatting = Formatting.Indented
+                };
+                using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
+                {
+                    serializer.Serialize(file, _listOfPreProcessedSamples);
+                }
             }
         }
 
         private void ExtractFromSamples()
         {
-            _extractor = new TFTExtractor();
-            _listOfDataSamples = new SamplesCollection(_extractor.Extract(_listOfPreProcessedSamples));
+            _extractor = new TFMExtractor();
+            //_listOfDataSamples = new SamplesCollection(_extractor.Extract(_listOfPreProcessedSamples));
+            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_extractor.Extract(_listOfPreProcessedSamples));
         }
 
         private void ClassifySamples()
         {
             var randomizer = new Random();
-            var learnedData = new SamplesCollection(_listOfDataSamples.Samples
+            var learnedData = new SamplesCollection(_concurrentBagOfDataSamples
                 .OrderBy(s => randomizer.Next())
                 .Take(_coldStartSamples).ToList());
-            _listOfDataSamples.Samples.Skip(_coldStartSamples)
-                .ToList()
-                .ForEach(s => _listOfClassifiedSamples.Add(
-                    NearestNeighboursClassifier.Classify(
+            //_listOfDataSamples.Samples.Skip(_coldStartSamples)
+            //    .ToList()
+            //    .ForEach(s => _listOfClassifiedSamples.Add(
+            //        NearestNeighboursClassifier.Classify(
+            //            s,
+            //            learnedData,
+            //            _nearestNeighboursNumber,
+            //            _metric
+            //    )));
+
+            _concurrentBagOfDataSamples
+                .Skip(_coldStartSamples)
+                .AsParallel()
+                .ForAll(s => _concurrentBagOfClassifiedSamples.Add(
+                    NearestNeighboursClassifier.Classify( 
                         s,
                         learnedData,
                         _nearestNeighboursNumber,
-                        _metric
-                )));
+                        _metric))
+                    );
         }
 
         private void ShowResults()
         {
-            if (_listOfClassifiedSamples != null)
+            if (_concurrentBagOfClassifiedSamples != null)
             {
-                ResultsWindow resultsWindow = new ResultsWindow(new ResultsViewModel(_listOfClassifiedSamples));
+                ResultsWindow resultsWindow = new ResultsWindow(new ResultsViewModel(_concurrentBagOfClassifiedSamples.ToList()));
                 resultsWindow.Show();
             }
         }

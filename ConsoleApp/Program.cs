@@ -1,8 +1,4 @@
-﻿using Core;
-using DataPreprocessing;
-using FileSamplesRead;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace ConsoleApp
 {
@@ -22,12 +18,6 @@ namespace ConsoleApp
             investment or planned output.
             Soviet Soviet Soviet";
 
-            var filter = new StopWordsFilter(WellKnownNames.StopWords);
-            var stemmer = new PorterStemmer();
-            //Classification(text);
-
-            var dataReader = new DataSamplesReader();
-            List<FileSamplesRead.Models.RawSample> samples = dataReader.ReadAllSamples("C:\\Users\\Mateusz\\Desktop\\reuters_przetworzone\\reut2-004.sgm", "places");
             //var filtered = samples
             //    .Select(s => (s.Labels, filter.Filter(s.Value.Body)))
             //    //.Select(f => (f.Item1,

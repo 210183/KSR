@@ -2,6 +2,8 @@
 {
     public enum ExtractorType
     {
-        Count
+        Count,
+        TFMWords,
+        TFMKeyWords,
     }
 }

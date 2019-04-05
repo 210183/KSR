@@ -10,9 +10,9 @@ using System.Xml;
 
 namespace FileSamplesRead
 {
-    public class DataSamplesReader
+    public static class DataSamplesReader
     {
-        public List<RawSample> ReadAllSamples(string filePath, string labelName)
+        public static List<RawSample> ReadAllSamples(string filePath, string labelName)
         {
             if (!File.Exists(filePath))
             {
@@ -73,7 +73,7 @@ namespace FileSamplesRead
             }
         }
 
-        private string ReadTextElement(XmlTextReader reader, string elementName)
+        private static string ReadTextElement(XmlTextReader reader, string elementName)
         {
             bool readerState = true;
             while (!string.Equals(reader.Name, elementName, StringComparison.InvariantCultureIgnoreCase)

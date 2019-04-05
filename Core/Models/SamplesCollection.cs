@@ -7,7 +7,7 @@ namespace Core.Models
 {
     public class SamplesCollection
     {
-        public SamplesCollection(List<DataSample> samples)
+        public SamplesCollection(IReadOnlyList<DataSample> samples)
         {
             if (samples?.Any() == true)
             {
@@ -19,6 +19,6 @@ namespace Core.Models
             }
         }
 
-        public List<DataSample> Samples { get; }
+        public IReadOnlyList<DataSample> Samples { get; }
     }
 }

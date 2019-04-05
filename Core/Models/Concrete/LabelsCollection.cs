@@ -1,6 +1,4 @@
-﻿using Core.Exceptions;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Core.Models.Concrete
 {
@@ -8,16 +6,9 @@ namespace Core.Models.Concrete
     {
         public LabelsCollection(IReadOnlyList<Label> labels)
         {
-            if (labels?.Any() == true)
-            {
-                Values = labels;
-            }
-            else
-            {
-                throw new LabelsException("Non empty attributes vector is required. ");
-            }
+            Values = labels;
         }
 
-        public IReadOnlyList<Label> Values { get; }
+        public IReadOnlyList<Label> Values { get; set; }
     }
 }

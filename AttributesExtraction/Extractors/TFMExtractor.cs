@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AttributesExtraction.Extractors
 {
-    public class TFTExtractor : IAttributeExtractor
+    public class TFMExtractor : IAttributeExtractor
     {
         public List<DataSample> Extract(List<PreProcessedSample> samples)
             => samples.Select(s => new DataSample(
