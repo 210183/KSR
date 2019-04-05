@@ -19,6 +19,8 @@ using System.Linq;
 using System.Windows.Forms;
 
 namespace ClassificationApp.ViewModels
+
+
 {
     internal class MainViewModel : BindableBase
     {
@@ -26,7 +28,7 @@ namespace ClassificationApp.ViewModels
         private string _labelName = "places";
         private int _nearestNeighboursNumber = 2;
         private int _coldStartSamples = 100;
-        private readonly ExtractorType _extractorType;
+        private ExtractorType _extractorType;
         private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
@@ -38,6 +40,10 @@ namespace ClassificationApp.ViewModels
 
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
         private readonly ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
+        private readonly JsonSerializer _serializer = new JsonSerializer
+        {
+            Formatting = Formatting.Indented
+        };
 
         private StopWordsFilter _stopWordsFilter = new StopWordsFilter(WellKnownNames.StopWords);
         private Lemmatizer _lemmatizer = new Lemmatizer();
@@ -65,11 +71,11 @@ namespace ClassificationApp.ViewModels
             get => _coldStartSamples;
             set => SetProperty(ref _coldStartSamples, value);
         }
-        //public ExtractorType ExtractorType
-        //{
-        //    get => _extractorType;
-        //    set => SetProperty(ref _extractorType, value);
-        //}
+        public ExtractorType ExtractorType
+        {
+            get => _extractorType;
+            set => SetProperty(ref _extractorType, value);
+        }
         public string DirectoryFilePath
         {
             get => _directoryFilePath;
@@ -138,18 +144,29 @@ namespace ClassificationApp.ViewModels
                 {
                     _listOfRawSamples.AddRange(DataSamplesReader.ReadAllSamples(path, LabelName));
                 }
+
+                //load labels filter
+                string labelsFilterPath = Path.Combine(Directory.GetCurrentDirectory(), "labelsFilter.json");
+                if (File.Exists(labelsFilterPath))
+                {
+                    using (JsonReader file = new JsonTextReader(File.OpenText(labelsFilterPath)))
+                    {
+                        var labelsFilter = _serializer.Deserialize<List<string>>(file);
+                        _listOfRawSamples = _listOfRawSamples
+                            .Where(s => s.Labels.Values.Count == 1 && labelsFilter.Contains(s.Labels.Values.Single().Name))
+                            .ToList();
+                    }
+                }
+
                 foreach (var sample in _listOfRawSamples)
-                //.Take(_listOfRawSamples.Count > 1000 ? 1000 : _listOfRawSamples.Count))
                 {
                     _listOfPreProcessedSamples.Add(_lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(sample)));
                 }
-                JsonSerializer serializer = new JsonSerializer
-                {
-                    Formatting = Formatting.Indented
-                };
+
+                //save results to json
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
                 {
-                    serializer.Serialize(file, _listOfPreProcessedSamples);
+                    _serializer.Serialize(file, _listOfPreProcessedSamples);
                 }
             }
         }

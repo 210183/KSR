@@ -67,6 +67,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Base\BindableBase.cs" />
+    <Compile Include="Base\EnumToCollectionConverter.cs" />
+    <Compile Include="Base\ExtractorTypeEnumHelper.cs" />
     <Compile Include="Base\IRaiseCanExecuteCommand.cs" />
     <Compile Include="Base\RelayCommand.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
