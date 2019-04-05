@@ -71,6 +71,7 @@
     <Compile Include="Base\ExtractorTypeEnumHelper.cs" />
     <Compile Include="Base\IRaiseCanExecuteCommand.cs" />
     <Compile Include="Base\RelayCommand.cs" />
+    <Compile Include="NearestNeighboursClassifier.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ResultsViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">

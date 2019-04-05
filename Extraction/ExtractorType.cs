@@ -5,6 +5,5 @@
         Count,
         TFMWords,
         TFMKeyWords,
-        NGram
     }
 }

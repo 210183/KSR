@@ -214,5 +214,22 @@ namespace ClassificationApp.ViewModels
                 resultsWindow.Show();
             }
         }
+
+        private IAttributeExtractor ResolveExtractor()
+        {
+            switch (_extractorType)
+            {
+                case ExtractorType.Count:
+                    return new CountExtractor(null, "Counted-key-words");
+                case ExtractorType.TFMWords:
+                    return new TFMExtractor();
+                case ExtractorType.TFMKeyWords:
+                    return new KeyWordsExtractor(null);
+                case ExtractorType.NGram:
+                    return new NGramExtractor(3);
+                default:
+                    throw new NotSupportedException($"Cannot construct this extractor type: {_extractorType.ToString()}");
+            }
+        }
     }
 }

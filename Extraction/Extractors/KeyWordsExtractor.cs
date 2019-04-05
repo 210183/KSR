@@ -9,10 +9,14 @@ namespace AttributesExtraction.Extractors
     public class KeyWordsExtractor : IAttributeExtractor
     {
         public List<string> KeyValues { get; set; }
+        public string AttributeName { get; set; }
 
-        public KeyWordsExtractor(List<string> keyValues)
+
+        public KeyWordsExtractor(List<string> keyValues, string attributeName)
         {
             KeyValues = keyValues;
+            AttributeName = attributeName;
+
         }
 
         public List<DataSample> Extract(List<PreProcessedSample> samples)
