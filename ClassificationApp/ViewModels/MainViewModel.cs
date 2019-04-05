@@ -28,6 +28,7 @@ namespace ClassificationApp.ViewModels
         private string _labelName = "places";
         private int _nearestNeighboursNumber = 2;
         private int _coldStartSamples = 100;
+        private int _samplesToClassify = 1000;
         private ExtractorType _extractorType;
         private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
@@ -95,6 +96,11 @@ namespace ClassificationApp.ViewModels
         {
             get => _listOfPreProcessedSamples;
             set => SetProperty(ref _listOfPreProcessedSamples, value);
+        }
+        public int SamplesToClassify
+        {
+            get => _samplesToClassify;
+            set => SetProperty(ref _samplesToClassify, value);
         }
         #endregion
 
@@ -187,6 +193,11 @@ namespace ClassificationApp.ViewModels
 
         private void ClassifySamples()
         {
+            if(_coldStartSamples + _samplesToClassify > _concurrentBagOfDataSamples.Count)
+            {
+                MessageBox.Show($"There's only {_concurrentBagOfDataSamples.Count} samples, cannot take {_coldStartSamples + _samplesToClassify}");
+                return;
+            }
             var randomizer = new Random();
             var learnedData = new SamplesCollection(_concurrentBagOfDataSamples
                 .OrderBy(s => randomizer.Next())
@@ -203,9 +214,10 @@ namespace ClassificationApp.ViewModels
 
             _concurrentBagOfDataSamples
                 .Skip(_coldStartSamples)
+                .Take(_samplesToClassify)
                 .AsParallel()
                 .ForAll(s => _concurrentBagOfClassifiedSamples.Add(
-                    NearestNeighboursClassifier.Classify( 
+                    NearestNeighboursClassifier.Classify(
                         s,
                         learnedData,
                         _nearestNeighboursNumber,

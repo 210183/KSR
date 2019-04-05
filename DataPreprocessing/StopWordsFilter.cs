@@ -22,7 +22,11 @@ namespace DataPreprocessing
                     input.Value.Dateline,
                     input.Value.Body.Split(new[] { ' ', '\t', '\r', '\n', ',', ';', '.' },
                             StringSplitOptions.RemoveEmptyEntries)
-                            .Where(w => !_stopWordsSet.Contains(w) && w.Length > 1).ToList()
+                            .Where(w => !_stopWordsSet.Contains(w)
+                            && !double.TryParse(w, out _)
+                            && w.Length > 1
+                            && w != "--"
+                            ).ToList()
                     ));
 
     }

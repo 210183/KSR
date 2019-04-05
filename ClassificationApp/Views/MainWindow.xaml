@@ -19,6 +19,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
 
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -55,21 +56,21 @@
 
         <Button Content="Extract" Command="{Binding ExtractCommand}" Margin="5,5,5,5" Background="DarkGoldenrod" Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="3" FontSize="15"></Button>
 
-        <!--<TextBlock Text="Extracted: " FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Grid.Column="7"></TextBlock>
-        <TextBlock Text="{Binding ListOfPreProcessedSamples.Count}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Grid.Column="7"></TextBlock>-->
-        
         <TextBlock Text="Choose k for KNN" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"></TextBlock>
         <TextBox Text="{Binding NearestNeighboursNumber, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" Grid.Row="5" Grid.Column="2" />
 
         <TextBlock Text="Cold-start number of samples" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="4" Grid.ColumnSpan="2"></TextBlock>
         <TextBox Text="{Binding ColdStartSamples, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" Grid.Row="5" Grid.Column="6" />
 
+        <TextBlock Text="Samples to classify" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="6" Grid.Column="4" Grid.ColumnSpan="2"></TextBlock>
+        <TextBox Text="{Binding SamplesToClassify, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" Grid.Row="6" Grid.Column="6" />
+
         <Button Content="Classify" Command="{Binding ClassifyCommand}" Margin="5,5,5,5" Background="DarkGoldenrod" Grid.Row="5" Grid.Column="7" Grid.ColumnSpan="3" FontSize="15"></Button>
-        <Button Content="Results" Command="{Binding ResultCommand}" Margin="5,5,5,5" Background="DarkGoldenrod" Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="4" FontSize="15"></Button>
+        <Button Content="Results" Command="{Binding ResultCommand}" Margin="5,5,5,5" Background="DarkGoldenrod" Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="4" FontSize="15"></Button>
 
         <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
         <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
-        <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
+        <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
 
 
 
