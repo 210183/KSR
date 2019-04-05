@@ -86,11 +86,15 @@ namespace ClassificationApp.ViewModels
             get => _filesInDirectory;
             private set => SetProperty(ref _filesInDirectory, value);
         }
-
         public bool ShouldUseJsonDataFile
         {
             get => _shouldUseJsonDataFile;
             set => SetProperty(ref _shouldUseJsonDataFile, value);
+        }
+        public List<PreProcessedSample> ListOfPreProcessedSamples
+        {
+            get => _listOfPreProcessedSamples;
+            set => SetProperty(ref _listOfPreProcessedSamples, value);
         }
         #endregion
 
@@ -123,7 +127,7 @@ namespace ClassificationApp.ViewModels
 
         private void LoadFiles()
         {
-            _listOfPreProcessedSamples = new List<PreProcessedSample>();
+            ListOfPreProcessedSamples = new List<PreProcessedSample>();
             if (ShouldUseJsonDataFile)
             {
                 JsonSerializer serializer = new JsonSerializer
@@ -132,8 +136,9 @@ namespace ClassificationApp.ViewModels
                 };
                 using (JsonReader reader = new JsonTextReader(File.OpenText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json"))))
                 {
-                    _listOfPreProcessedSamples = serializer.Deserialize<List<PreProcessedSample>>(reader);
+                    ListOfPreProcessedSamples = serializer.Deserialize<List<PreProcessedSample>>(reader);
                 }
+                FilesInDirectory = 1;
             }
             else
             {
@@ -146,36 +151,38 @@ namespace ClassificationApp.ViewModels
                 }
 
                 //load labels filter
-                string labelsFilterPath = Path.Combine(Directory.GetCurrentDirectory(), "labelsFilter.json");
-                if (File.Exists(labelsFilterPath))
-                {
-                    using (JsonReader file = new JsonTextReader(File.OpenText(labelsFilterPath)))
-                    {
-                        var labelsFilter = _serializer.Deserialize<List<string>>(file);
-                        _listOfRawSamples = _listOfRawSamples
-                            .Where(s => s.Labels.Values.Count == 1 && labelsFilter.Contains(s.Labels.Values.Single().Name))
-                            .ToList();
-                    }
-                }
+                TryFilterLabels();
 
-                foreach (var sample in _listOfRawSamples)
-                {
-                    _listOfPreProcessedSamples.Add(_lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(sample)));
-                }
-
+                ListOfPreProcessedSamples = _listOfRawSamples
+                        .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
                 //save results to json
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
                 {
-                    _serializer.Serialize(file, _listOfPreProcessedSamples);
+                    _serializer.Serialize(file, ListOfPreProcessedSamples);
+                }
+            }
+        }
+
+        private void TryFilterLabels()
+        {
+            string labelsFilterPath = Path.Combine(Directory.GetCurrentDirectory(), "labelsFilter.json");
+            if (File.Exists(labelsFilterPath))
+            {
+                using (JsonReader file = new JsonTextReader(File.OpenText(labelsFilterPath)))
+                {
+                    var labelsFilter = _serializer.Deserialize<List<string>>(file);
+                    _listOfRawSamples = _listOfRawSamples
+                        .Where(s => s.Labels.Values.Count == 1 && labelsFilter.Contains(s.Labels.Values.Single().Name))
+                        .ToList();
                 }
             }
         }
 
         private void ExtractFromSamples()
         {
-            _extractor = new TFMExtractor();
+            _extractor = ResolveExtractor();
             //_listOfDataSamples = new SamplesCollection(_extractor.Extract(_listOfPreProcessedSamples));
-            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_extractor.Extract(_listOfPreProcessedSamples));
+            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
         }
 
         private void ClassifySamples()
@@ -220,16 +227,25 @@ namespace ClassificationApp.ViewModels
             switch (_extractorType)
             {
                 case ExtractorType.Count:
-                    return new CountExtractor(null, "Counted-key-words");
+                    return new CountExtractor(LoadKeywords(), "Counted-key-words");
                 case ExtractorType.TFMWords:
                     return new TFMExtractor();
                 case ExtractorType.TFMKeyWords:
-                    return new KeyWordsExtractor(null);
+                    return new KeyWordsExtractor(LoadKeywords());
                 case ExtractorType.NGram:
                     return new NGramExtractor(3);
                 default:
                     throw new NotSupportedException($"Cannot construct this extractor type: {_extractorType.ToString()}");
             }
+        }
+
+        private List<string> LoadKeywords()
+        {
+            string keywordsPath = Path.Combine(Directory.GetCurrentDirectory(), "keywords.json");
+            if (File.Exists(keywordsPath))
+                using (JsonReader file = new JsonTextReader(File.OpenText(keywordsPath)))
+                    return _serializer.Deserialize<List<string>>(file);
+            return null;
         }
     }
 }
