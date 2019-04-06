@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.106
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttributesExtraction", "AttributesExtraction\AttributesExtraction.csproj", "{5AA638DB-143B-4734-9F16-7252BB917464}"
 EndProject
@@ -33,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassificationApp", "ClassificationApp\ClassificationApp.csproj", "{8D15C6D4-9F45-4C70-980C-A6FBF4AAAEF9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileFixer", "FileFixer\FileFixer.csproj", "{A0DD7187-7C5F-4526-BF91-9A0075FF57EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassificationAppAutomatizer", "ClassificationAppAutomatizer\ClassificationAppAutomatizer.csproj", "{1695DF6E-5376-4242-B90B-8E9C9EC4A2E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,6 +90,10 @@ Global
 		{A0DD7187-7C5F-4526-BF91-9A0075FF57EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0DD7187-7C5F-4526-BF91-9A0075FF57EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0DD7187-7C5F-4526-BF91-9A0075FF57EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1695DF6E-5376-4242-B90B-8E9C9EC4A2E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1695DF6E-5376-4242-B90B-8E9C9EC4A2E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1695DF6E-5376-4242-B90B-8E9C9EC4A2E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1695DF6E-5376-4242-B90B-8E9C9EC4A2E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace ClassificationApp.Base
 {
-    class BindableBase: INotifyPropertyChanged
+    public class BindableBase: INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 

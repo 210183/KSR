@@ -23,7 +23,7 @@ namespace ClassificationApp.ViewModels
 
 
 {
-    internal class MainViewModel : BindableBase
+    public  class MainViewModel : BindableBase
     {
         private decimal _percentageOfLearningFiles;
         private string _labelName = "places";
