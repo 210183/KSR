@@ -10,6 +10,7 @@ using Core.Models.Concrete;
 using DataPreprocessing;
 using FileSamplesRead;
 using FileSamplesRead.Models;
+using KeywordsExtraction;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -183,6 +184,13 @@ namespace ClassificationApp.ViewModels
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
                 {
                     _serializer.Serialize(file, ListOfPreProcessedSamples);
+                }
+
+                //create and save new keywords
+                KeywordExtractor.Extract(ListOfPreProcessedSamples);
+                using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(Directory.GetCurrentDirectory(), "keywords"), "json")))
+                {
+                    _serializer.Serialize(file, KeywordsSelector.LoadKeywords());
                 }
             }
         }
