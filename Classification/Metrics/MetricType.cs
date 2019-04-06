@@ -2,7 +2,6 @@
 {
     public enum MetricType
     {
-        Unknown = 0,
         Manhattan,
         Euclidean,
         Chebyshev
