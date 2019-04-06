@@ -37,7 +37,7 @@ namespace ClassificationApp.ViewModels
         private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
         private ConcurrentBag<DataSample> _concurrentBagOfDataSamples;
         private bool _shouldUseJsonDataFile;
-        private bool _isDataSGM = true;
+        private bool _isDataSGM;
 
         private ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
@@ -116,6 +116,7 @@ namespace ClassificationApp.ViewModels
         public IRaiseCanExecuteCommand ClassifyCommand { get; }
         public IRaiseCanExecuteCommand ResultCommand { get; }
         public IRaiseCanExecuteCommand ChangeUseJsonDataFile { get; }
+        public IRaiseCanExecuteCommand ChangeIsDataSGM { get; }
         #endregion
 
         public MainViewModel()
@@ -126,6 +127,7 @@ namespace ClassificationApp.ViewModels
             ClassifyCommand = new RelayCommand(ClassifySamples);
             ResultCommand = new RelayCommand(ShowResults);
             ChangeUseJsonDataFile = new RelayCommand(() => _shouldUseJsonDataFile = !_shouldUseJsonDataFile);
+            ChangeIsDataSGM = new RelayCommand(() => _isDataSGM = !_isDataSGM);
         }
 
         private void ReadDirectoryPath()
@@ -175,6 +177,7 @@ namespace ClassificationApp.ViewModels
                         LabelName);
                     ListOfPreProcessedSamples = _listOfRawSamples
                         .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
+                    FilesInDirectory = 1;
                 }
                 //save results to json
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
