@@ -9,6 +9,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="900"
         Background="DimGray">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
     <Grid Margin="20,20,20,20" Background="DarkGray">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -37,8 +40,8 @@
         <Button Content="Open directory" Command="{Binding OpenDirectoryCommand}" Margin="5,5,5,5" Background="DarkGoldenrod" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontSize="15"></Button>
         <TextBox Text="{Binding DirectoryFilePath, Mode=OneWay}" TextAlignment="Center"  FontSize="15" Margin="5,5,5,5" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" IsReadOnly="True"/>
         <ToggleButton Content="Json?" Command="{Binding ChangeUseJsonDataFile}" VerticalAlignment="Top" Margin="10, 0, 10, 20" Background="DarkGoldenrod" Grid.Row="0" Grid.Column="4" FontSize="12" ></ToggleButton>
-        <ToggleButton Content="SGM?" Command="{Binding ChangeIsDataSGM}" VerticalAlignment="Bottom" Margin="10, 20, 10, 0" Background="DarkGoldenrod" Grid.Row="0" Grid.Column="4" FontSize="12" ></ToggleButton>
-        <Button Content="Load files" Command="{Binding LoadFilesCommand}" Margin="5,10,5,10" Background="DarkGoldenrod" Grid.Row="0" Grid.Column="5" FontSize="15"></Button>
+        <ToggleButton Content="SGM?" Command="{Binding ChangeIsDataSgm}" VerticalAlignment="Bottom" Margin="10, 20, 10, 0" Background="DarkGoldenrod" Grid.Row="0" Grid.Column="4" FontSize="12" ></ToggleButton>
+        <Button Content="Load files" Command="{Binding LoadFilesCommand}" Margin="5,10,5,10" Background="DarkGoldenrod" Grid.Row="0" Grid.Column="5" FontSize="15"/>
         <TextBlock Text="Files in directory:" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="6" Grid.ColumnSpan="2" Margin="10,0,0,0"></TextBlock>
         <TextBlock Text="{Binding FilesInDirectory, Mode = OneWay}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="6" Grid.ColumnSpan="2"/>
         <TextBlock Text="Extracted samples:" FontSize="15" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="0" Grid.Column="7" Grid.ColumnSpan="2" Margin="0,0,10,0"></TextBlock>
@@ -57,9 +60,22 @@
 
         <Button Content="Extract" Command="{Binding ExtractCommand}" Margin="5,5,5,5" Background="DarkGoldenrod" Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="3" FontSize="15"></Button>
 
+        <TextBlock Visibility="{Binding Path=ShowNGramInput, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                   Text="N for n-grams" FontSize="15" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                   Grid.Row="2" Grid.Column="7"/>
+        <TextBox Visibility="{Binding Path=ShowNGramInput, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                 Text="{Binding NForNGram, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" 
+                 Grid.Row="2" Grid.Column="8" Grid.ColumnSpan="2"/>
+        
         <TextBlock Text="Choose k for KNN" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"></TextBlock>
         <TextBox Text="{Binding NearestNeighboursNumber, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" Grid.Row="5" Grid.Column="2" />
 
+        <TextBlock Text="Choose metric type" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"></TextBlock>
+        <ComboBox Grid.Row="6" Grid.Column="2" Margin="5,5,5,5" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                  ItemsSource="{Binding Path=MetricType, Converter={helpers:EnumToCollectionConverter}, Mode=OneTime}"
+                  SelectedValue="{Binding Path=MetricType}"/>
+        
         <TextBlock Text="Cold-start number of samples" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="4" Grid.ColumnSpan="2"></TextBlock>
         <TextBox Text="{Binding ColdStartSamples, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" Grid.Row="5" Grid.Column="6" />
 
@@ -72,8 +88,6 @@
         <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
         <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
         <TextBox Background="DimGray" BorderThickness="0" FontSize="15" Margin="0,15,0,15" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="9" IsReadOnly="True"/>
-
-
 
     </Grid>
 </Window>

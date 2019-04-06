@@ -31,6 +31,7 @@ namespace ClassificationApp.ViewModels
         private int _coldStartSamples = 100;
         private int _samplesToClassify = 1000;
         private ExtractorType _extractorType;
+        private MetricType _metricType;
         private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
@@ -38,7 +39,9 @@ namespace ClassificationApp.ViewModels
         private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
         private ConcurrentBag<DataSample> _concurrentBagOfDataSamples;
         private bool _shouldUseJsonDataFile;
-        private bool _isDataSGM;
+        private bool _isDataSgm;
+        private bool _showNGramInput = false;
+        private int _nForNGram;
 
         private ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
@@ -50,13 +53,22 @@ namespace ClassificationApp.ViewModels
         private StopWordsFilter _stopWordsFilter = new StopWordsFilter(WellKnownNames.StopWords);
         private Lemmatizer _lemmatizer = new Lemmatizer();
         private IAttributeExtractor _extractor;
-        private IMetric _metric = new ManhattanMetric();
 
         #region observable props
         public decimal PercentageOfLearningFiles
         {
             get => _percentageOfLearningFiles;
             set => SetProperty(ref _percentageOfLearningFiles, value);
+        }        
+        public int NForNGram
+        {
+            get => _nForNGram;
+            set => SetProperty(ref _nForNGram, value);
+        }
+        public bool ShowNGramInput
+        {
+            get => _showNGramInput;
+            set => SetProperty(ref _showNGramInput, value);
         }
         public string LabelName
         {
@@ -76,8 +88,19 @@ namespace ClassificationApp.ViewModels
         public ExtractorType ExtractorType
         {
             get => _extractorType;
-            set => SetProperty(ref _extractorType, value);
+            set
+            {
+                SetProperty(ref _extractorType, value);
+                ShowNGramInput = value == ExtractorType.NGram;
+            }
         }
+        
+        public MetricType MetricType
+        {
+            get => _metricType;
+            set => SetProperty(ref _metricType, value);
+        }
+
         public string DirectoryFilePath
         {
             get => _directoryFilePath;
@@ -93,10 +116,10 @@ namespace ClassificationApp.ViewModels
             get => _shouldUseJsonDataFile;
             set => SetProperty(ref _shouldUseJsonDataFile, value);
         }
-        public bool IsDataSGM
+        public bool IsDataSgm
         {
-            get => _isDataSGM;
-            set => SetProperty(ref _isDataSGM, value);
+            get => _isDataSgm;
+            set => SetProperty(ref _isDataSgm, value);
         }
         public List<PreProcessedSample> ListOfPreProcessedSamples
         {
@@ -117,7 +140,7 @@ namespace ClassificationApp.ViewModels
         public IRaiseCanExecuteCommand ClassifyCommand { get; }
         public IRaiseCanExecuteCommand ResultCommand { get; }
         public IRaiseCanExecuteCommand ChangeUseJsonDataFile { get; }
-        public IRaiseCanExecuteCommand ChangeIsDataSGM { get; }
+        public IRaiseCanExecuteCommand ChangeIsDataSgm { get; }
         #endregion
 
         public MainViewModel()
@@ -128,7 +151,7 @@ namespace ClassificationApp.ViewModels
             ClassifyCommand = new RelayCommand(ClassifySamples);
             ResultCommand = new RelayCommand(ShowResults);
             ChangeUseJsonDataFile = new RelayCommand(() => _shouldUseJsonDataFile = !_shouldUseJsonDataFile);
-            ChangeIsDataSGM = new RelayCommand(() => _isDataSGM = !_isDataSGM);
+            ChangeIsDataSgm = new RelayCommand(() => _isDataSgm = !_isDataSgm);
         }
 
         private void ReadDirectoryPath()
@@ -155,7 +178,7 @@ namespace ClassificationApp.ViewModels
             }
             else
             {
-                if (_isDataSGM)
+                if (_isDataSgm)
                 {
                     _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
                     FilesInDirectory = _listOfFiles.Count;
@@ -238,7 +261,7 @@ namespace ClassificationApp.ViewModels
                         s,
                         learnedData,
                         _nearestNeighboursNumber,
-                        _metric))
+                        ResolveMetric()))
                     );
         }
 
@@ -265,6 +288,21 @@ namespace ClassificationApp.ViewModels
                     return new NGramExtractor(3);
                 default:
                     throw new NotSupportedException($"Cannot construct this extractor type: {_extractorType.ToString()}");
+            }
+        }
+        
+        private IMetric ResolveMetric()
+        {
+            switch (_metricType)
+            {
+                case MetricType.Chebyshev:
+                    return new ChebyshevMetric();
+                case MetricType.Euclidean:
+                    return new EuclideanMetric();
+                case MetricType.Manhattan:
+                    return new ManhattanMetric();
+                default:
+                    throw new NotSupportedException($"Cannot construct this extractor type: {_metricType.ToString()}");
             }
         }
 
