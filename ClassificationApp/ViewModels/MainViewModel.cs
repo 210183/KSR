@@ -35,12 +35,12 @@ namespace ClassificationApp.ViewModels
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
         private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
-        private SamplesCollection _listOfDataSamples;
         private ConcurrentBag<DataSample> _concurrentBagOfDataSamples;
         private bool _shouldUseJsonDataFile;
+        private bool _isDataSGM = true;
 
+        private ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
-        private readonly ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
         private readonly JsonSerializer _serializer = new JsonSerializer
         {
             Formatting = Formatting.Indented
@@ -92,6 +92,11 @@ namespace ClassificationApp.ViewModels
             get => _shouldUseJsonDataFile;
             set => SetProperty(ref _shouldUseJsonDataFile, value);
         }
+        public bool IsDataSGM
+        {
+            get => _isDataSGM;
+            set => SetProperty(ref _isDataSGM, value);
+        }
         public List<PreProcessedSample> ListOfPreProcessedSamples
         {
             get => _listOfPreProcessedSamples;
@@ -123,7 +128,6 @@ namespace ClassificationApp.ViewModels
             ChangeUseJsonDataFile = new RelayCommand(() => _shouldUseJsonDataFile = !_shouldUseJsonDataFile);
         }
 
-
         private void ReadDirectoryPath()
         {
             FolderBrowserDialog folderDialog = new FolderBrowserDialog();
@@ -148,19 +152,30 @@ namespace ClassificationApp.ViewModels
             }
             else
             {
-                _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
-                FilesInDirectory = _listOfFiles.Count;
-                _listOfRawSamples = new List<RawSample>();
-                foreach (string path in _listOfFiles)
+                if (_isDataSGM)
                 {
-                    _listOfRawSamples.AddRange(DataSamplesReader.ReadAllSamples(path, LabelName));
+                    _listOfFiles = Directory.GetFiles(DirectoryFilePath).Where(p => Path.GetExtension(p) == ".sgm").ToList();
+                    FilesInDirectory = _listOfFiles.Count;
+                    _listOfRawSamples = new List<RawSample>();
+                    foreach (string path in _listOfFiles)
+                    {
+                        _listOfRawSamples.AddRange(DataSamplesReader.ReadAllSamples(path, LabelName));
+                    }
+
+                    //load labels filter
+                    TryFilterLabels();
+
+                    ListOfPreProcessedSamples = _listOfRawSamples
+                            .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
                 }
-
-                //load labels filter
-                TryFilterLabels();
-
-                ListOfPreProcessedSamples = _listOfRawSamples
+                else
+                {
+                    _listOfRawSamples = OneLinerReader.ReadAllSamples(
+                        Directory.GetFiles(DirectoryFilePath).First(p => Path.GetFileName(p) == "data.txt"),
+                        LabelName);
+                    ListOfPreProcessedSamples = _listOfRawSamples
                         .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
+                }
                 //save results to json
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
                 {
@@ -187,30 +202,21 @@ namespace ClassificationApp.ViewModels
         private void ExtractFromSamples()
         {
             _extractor = ResolveExtractor();
-            //_listOfDataSamples = new SamplesCollection(_extractor.Extract(_listOfPreProcessedSamples));
             _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
         }
 
         private void ClassifySamples()
         {
-            if(_coldStartSamples + _samplesToClassify > _concurrentBagOfDataSamples.Count)
+            if (_coldStartSamples + _samplesToClassify > _concurrentBagOfDataSamples.Count)
             {
                 MessageBox.Show($"There's only {_concurrentBagOfDataSamples.Count} samples, cannot take {_coldStartSamples + _samplesToClassify}");
                 return;
             }
+            _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
             var randomizer = new Random();
             var learnedData = new SamplesCollection(_concurrentBagOfDataSamples
                 .OrderBy(s => randomizer.Next())
                 .Take(_coldStartSamples).ToList());
-            //_listOfDataSamples.Samples.Skip(_coldStartSamples)
-            //    .ToList()
-            //    .ForEach(s => _listOfClassifiedSamples.Add(
-            //        NearestNeighboursClassifier.Classify(
-            //            s,
-            //            learnedData,
-            //            _nearestNeighboursNumber,
-            //            _metric
-            //    )));
 
             _concurrentBagOfDataSamples
                 .Skip(_coldStartSamples)
