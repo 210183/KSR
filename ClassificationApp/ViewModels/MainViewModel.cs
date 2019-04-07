@@ -32,7 +32,7 @@ namespace ClassificationApp.ViewModels
         private int _samplesToClassify = 1000;
         private ExtractorType _extractorType;
         private MetricType _metricType;
-        private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
+        private string _directoryFilePath = @"C:\Users\Jakub\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;

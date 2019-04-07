@@ -4,21 +4,26 @@ using ClassificationApp.ViewModels;
 using Statistics.Calculation;
 using Statistics.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ClassificationAppAutomatizer
 {
     internal class Program
     {
-        private const int K_Max = 5;
+        private const int K_Min = 1;
+        private const int K_Max = 1;
         private const int ColdStart_Min = 100;
         private const int ColdStart_Step = 20;
-        private const int ColdStart_Max = 301;
+        private const int ColdStart_Max = 101;
         private const int SamplesToClassify = 1000;
-        private const int ClassificationTries_Max = 5;
+        private const int ClassificationTries_Max = 1;
         private const int KeywordsExtractionTries = 1;
+        private const bool saveToExcel = true;
 
         private static void Main(string[] args)
         {
@@ -32,7 +37,7 @@ namespace ClassificationAppAutomatizer
 
             context.LoadFilesCommand.Execute(null);
 
-            for (int k = 4; k <= K_Max; k++)
+            for (int k = K_Min; k <= K_Max; k++)
             {
                 context.NearestNeighboursNumber = k;
                 TestForK(context, Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "results"), $"k_{k}"));
@@ -78,7 +83,14 @@ namespace ClassificationAppAutomatizer
                 context.ClassifyCommand.Execute(null);
                 results.Add(Calculator.CalculateConfusionMatrix(context.ConcurrentBagOfClassifiedSamples.ToList()));
             }
-            SaveResults(MeanOfMatrix(results), Path.Combine(filePath, $"tries_{ClassificationTries_Max}"));
+
+            if(saveToExcel)
+                SaveResultsToExcel(MeanOfMatrix(results), Path.Combine(filePath, $"tries_{ClassificationTries_Max}"));
+            else
+                SaveResults(MeanOfMatrix(results), Path.Combine(filePath, $"tries_{ClassificationTries_Max}"));
+
+                
+            
         }
 
         private static ConfusionMatrix MeanOfMatrix(List<ConfusionMatrix> matrices)
@@ -118,5 +130,53 @@ namespace ClassificationAppAutomatizer
                 }
             }
         }
+        
+        private static void SaveResultsToExcel(ConfusionMatrix result, string filePath)
+        {
+            Directory.CreateDirectory(filePath);
+            using (var writer = new StreamWriter(new FileStream(Path.Combine(filePath, "results.txt"), FileMode.Create)))
+            {
+                System.Data.DataTable table = new System.Data.DataTable();
+                table.Columns.Add("Accuracy");
+                table.Columns.Add("Precision");
+                table.Columns.Add("Recall");
+                table.Columns.Add("Specificity");
+                
+                table.Rows.Add(Calculator.CalculateAccuracy(result).ToString("F2"),
+                                Calculator.CalculatePrecision(result).ToString("F2"),
+                                Calculator.CalculateRecall(result).ToString("F2"),
+                                Calculator.CalculateSpecificity(result).ToString("F2")
+                                );  
+                
+                System.Data.DataTable tableResults = new System.Data.DataTable();
+
+                for (int i=0; i<result.Labels.Count; i++)
+                {
+                    tableResults.Columns.Add(result.Labels[i]);
+                }
+                
+                var rawResult = result.Value;
+                for (int i=0; i<rawResult.RowCount; i++)
+                {
+                    DataRow dataRow = tableResults.NewRow();
+                    
+                    for (int j=0; j<rawResult.ColumnCount; j++)
+                    {
+                        dataRow[result.Labels[j]] = result.Value[i, j];
+                    }
+                    tableResults.Rows.Add(dataRow);
+                }
+
+                
+                XLWorkbook workbook = new XLWorkbook();
+                var wb1 = workbook.Worksheets.Add(table, "Statistics").SetTabColor(XLColor.Amber);
+                var wb2 = workbook.Worksheets.Add(tableResults, "Matrix").SetTabColor(XLColor.Aqua);
+                
+                wb1.ColumnWidth = 14;
+                wb2.ColumnWidth = 14;
+                workbook.SaveAs(Path.Combine(filePath, "results.xlsx"));
+            }
+        }
+        
     }
 }
