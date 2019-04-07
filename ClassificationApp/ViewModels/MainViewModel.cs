@@ -143,6 +143,8 @@ namespace ClassificationApp.ViewModels
         public IRaiseCanExecuteCommand ChangeIsDataSgm { get; }
         #endregion
 
+        public ConcurrentBag<ClassifiedDataSample> ConcurrentBagOfClassifiedSamples { get => _concurrentBagOfClassifiedSamples; set => _concurrentBagOfClassifiedSamples = value; }
+
         public MainViewModel()
         {
             OpenDirectoryCommand = new RelayCommand(ReadDirectoryPath);
@@ -246,7 +248,7 @@ namespace ClassificationApp.ViewModels
                 MessageBox.Show($"There's only {_concurrentBagOfDataSamples.Count} samples, cannot take {_coldStartSamples + _samplesToClassify}");
                 return;
             }
-            _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
+            ConcurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
             var randomizer = new Random();
             var learnedData = new SamplesCollection(_concurrentBagOfDataSamples
                 .OrderBy(s => randomizer.Next())
@@ -256,7 +258,7 @@ namespace ClassificationApp.ViewModels
                 .Skip(_coldStartSamples)
                 .Take(_samplesToClassify)
                 .AsParallel()
-                .ForAll(s => _concurrentBagOfClassifiedSamples.Add(
+                .ForAll(s => ConcurrentBagOfClassifiedSamples.Add(
                     NearestNeighboursClassifier.Classify(
                         s,
                         learnedData,
@@ -267,9 +269,9 @@ namespace ClassificationApp.ViewModels
 
         private void ShowResults()
         {
-            if (_concurrentBagOfClassifiedSamples != null)
+            if (ConcurrentBagOfClassifiedSamples != null)
             {
-                ResultsWindow resultsWindow = new ResultsWindow(new ResultsViewModel(_concurrentBagOfClassifiedSamples.ToList()));
+                ResultsWindow resultsWindow = new ResultsWindow(new ResultsViewModel(ConcurrentBagOfClassifiedSamples.ToList()));
                 resultsWindow.Show();
             }
         }
