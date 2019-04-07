@@ -46,9 +46,6 @@
         <TextBlock Text="{Binding FilesInDirectory, Mode = OneWay}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="6" Grid.ColumnSpan="2"/>
         <TextBlock Text="Extracted samples:" FontSize="15" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="0" Grid.Column="7" Grid.ColumnSpan="2" Margin="0,0,10,0"></TextBlock>
         <TextBlock Text="{Binding ListOfPreProcessedSamples.Count, Mode = OneWay}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Bottom"  Grid.Row="0" Grid.Column="7" Grid.ColumnSpan="2"/>
-        
-        <TextBlock Text="Percentage of learning files" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"></TextBlock>
-        <TextBox Text="{Binding PercentageOfLearningFiles, Mode=TwoWay}" TextAlignment="Center" FontSize="15" Margin="5,5,5,5" Grid.Row="2" Grid.Column="2"/>
 
         <TextBlock Text="Choose extractor type" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2"></TextBlock>
         <ComboBox Grid.Row="2" Grid.Column="6" Margin="5,5,5,5" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"

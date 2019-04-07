@@ -1,8 +1,8 @@
 ﻿namespace Statistics.Models
 {
-    public class Statistics
+    public class MatrixStatistics
     {
-        public Statistics(double accuracy, double precision, double recall, double specificity)
+        public MatrixStatistics(double accuracy, double precision, double recall, double specificity)
         {
             Accuracy = accuracy;
             Precision = precision;

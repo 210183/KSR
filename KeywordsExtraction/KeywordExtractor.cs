@@ -30,7 +30,7 @@ namespace KeywordsExtraction
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), Constants.DirectoryName);
             Directory.CreateDirectory(filePath);
             string path = Path.Combine(filePath, label);
-            using (var writer = new StreamWriter(new FileStream(Path.ChangeExtension(path, Constants.FileExtensions), FileMode.OpenOrCreate)))
+            using (var writer = new StreamWriter(new FileStream(Path.ChangeExtension(path, Constants.FileExtensions), FileMode.Create)))
             {
                 foreach (var (word, counter) in words.Take(howManyToSave))
                 {

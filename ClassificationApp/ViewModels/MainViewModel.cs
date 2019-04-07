@@ -25,7 +25,6 @@ namespace ClassificationApp.ViewModels
 {
     public  class MainViewModel : BindableBase
     {
-        private decimal _percentageOfLearningFiles;
         private string _labelName = "places";
         private int _nearestNeighboursNumber = 2;
         private int _coldStartSamples = 100;
@@ -41,9 +40,7 @@ namespace ClassificationApp.ViewModels
         private bool _shouldUseJsonDataFile;
         private bool _isDataSgm;
         private bool _showNGramInput = false;
-        private int _nForNGram;
-
-        private ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
+        private int _nForNGram = 2;
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
         private readonly JsonSerializer _serializer = new JsonSerializer
         {
@@ -55,11 +52,6 @@ namespace ClassificationApp.ViewModels
         private IAttributeExtractor _extractor;
 
         #region observable props
-        public decimal PercentageOfLearningFiles
-        {
-            get => _percentageOfLearningFiles;
-            set => SetProperty(ref _percentageOfLearningFiles, value);
-        }        
         public int NForNGram
         {
             get => _nForNGram;
@@ -143,7 +135,7 @@ namespace ClassificationApp.ViewModels
         public IRaiseCanExecuteCommand ChangeIsDataSgm { get; }
         #endregion
 
-        public ConcurrentBag<ClassifiedDataSample> ConcurrentBagOfClassifiedSamples { get => _concurrentBagOfClassifiedSamples; set => _concurrentBagOfClassifiedSamples = value; }
+        public ConcurrentBag<ClassifiedDataSample> ConcurrentBagOfClassifiedSamples { get; set; } = new ConcurrentBag<ClassifiedDataSample>();
 
         public MainViewModel()
         {
@@ -210,7 +202,6 @@ namespace ClassificationApp.ViewModels
                 {
                     _serializer.Serialize(file, ListOfPreProcessedSamples);
                 }
-
                 //create and save new keywords
                 KeywordExtractor.Extract(ListOfPreProcessedSamples);
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(Directory.GetCurrentDirectory(), "keywords"), "json")))
@@ -303,6 +294,8 @@ namespace ClassificationApp.ViewModels
                     return new EuclideanMetric();
                 case MetricType.Manhattan:
                     return new ManhattanMetric();
+                case MetricType.Cosin:
+                    return new CosMetric();
                 default:
                     throw new NotSupportedException($"Cannot construct this extractor type: {_metricType.ToString()}");
             }

@@ -5,13 +5,13 @@ namespace Statistics.Models
 {
     public class SummaryStatistics
     {
-        public SummaryStatistics(Models.Statistics summary, Dictionary<Label, Models.Statistics> labelsStatistics)
+        public SummaryStatistics(Models.MatrixStatistics summary, Dictionary<Label, Models.MatrixStatistics> labelsStatistics)
         {
             Summary = summary;
             LabelsStatistics = labelsStatistics;
         }
 
-        public Models.Statistics Summary { get; }
-        public Dictionary<Label, Models.Statistics> LabelsStatistics { get; }
+        public Models.MatrixStatistics Summary { get; }
+        public Dictionary<Label, Models.MatrixStatistics> LabelsStatistics { get; }
     }
 }

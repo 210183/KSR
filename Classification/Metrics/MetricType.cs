@@ -4,6 +4,7 @@
     {
         Manhattan,
         Euclidean,
-        Chebyshev
+        Chebyshev,
+        Cosin
     }
 }
