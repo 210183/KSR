@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ClassificationApp.Views"
         xmlns:dg2d="clr-namespace:DataGrid2DLibrary;assembly=DataGrid2DLibrary"
         mc:Ignorable="d"
-        Title="ResultsWindow" Height="450" Width="800"
+        Title="ResultsWindow" Height="600" Width="1200"
         Background="DimGray">
     <Grid Margin="20,20,20,20" Background="DarkGray">
         <Grid.RowDefinitions>

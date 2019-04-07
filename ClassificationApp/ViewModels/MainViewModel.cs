@@ -25,13 +25,13 @@ namespace ClassificationApp.ViewModels
 {
     public  class MainViewModel : BindableBase
     {
-        private decimal _percentageOfLearningFiles;
+        private decimal _percentageOfLearningFiles = 40;
         private string _labelName = "places";
         private int _nearestNeighboursNumber = 2;
         private int _coldStartSamples = 100;
         private int _samplesToClassify = 1000;
-        private ExtractorType _extractorType;
-        private MetricType _metricType;
+        private ExtractorType _extractorType = ExtractorType.NGram;
+        private MetricType _metricType = MetricType.Manhattan;
         private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
@@ -41,7 +41,7 @@ namespace ClassificationApp.ViewModels
         private bool _shouldUseJsonDataFile;
         private bool _isDataSgm;
         private bool _showNGramInput = false;
-        private int _nForNGram;
+        private int _nForNGram = 2;
 
         private ConcurrentBag<ClassifiedDataSample> _concurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
         private readonly List<ClassifiedDataSample> _listOfClassifiedSamples = new List<ClassifiedDataSample>();
@@ -258,11 +258,21 @@ namespace ClassificationApp.ViewModels
                 .ToList();
             int howManyFromGroup = _coldStartSamples / groupsCounted.Count();
             List<DataSample> learnedSamples = new List<DataSample>();
+            var newSamples = _concurrentBagOfDataSamples.ToList();
             foreach (var group in groupsCounted)
             {
-                learnedSamples.AddRange(group.group.OrderBy(s => randomizer.Next()).Take(Math.Min(howManyFromGroup, group.count)));
+                var coldSamples = group.group
+                    .OrderBy(s => randomizer.Next())
+                    .Take((int)(PercentageOfLearningFiles * group.count / 100))
+                    .Take(Math.Min(howManyFromGroup, group.count))
+                    .ToList();
+                foreach (var sample in coldSamples)
+                {
+                    learnedSamples.Add(sample);
+                    newSamples.Remove(sample);
+                }
             }
-
+            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(newSamples);
             SamplesCollection learnedData = new SamplesCollection(learnedSamples);
 
             ConcurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
@@ -277,6 +287,10 @@ namespace ClassificationApp.ViewModels
                         _nearestNeighboursNumber,
                         ResolveMetric()))
                     );
+            foreach (var coldSample in learnedData.Samples)
+            {
+                _concurrentBagOfDataSamples.Add(coldSample);
+            }
         }
 
         private void ShowResults()
