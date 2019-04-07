@@ -32,7 +32,7 @@ namespace ClassificationApp.ViewModels
         private int _samplesToClassify = 1000;
         private ExtractorType _extractorType;
         private MetricType _metricType;
-        private string _directoryFilePath = @"C:\Users\Jakub\Desktop\reuters_przetworzone";
+        private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
@@ -250,9 +250,20 @@ namespace ClassificationApp.ViewModels
             }
             ConcurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
             var randomizer = new Random();
-            var learnedData = new SamplesCollection(_concurrentBagOfDataSamples
-                .OrderBy(s => randomizer.Next())
-                .Take(_coldStartSamples).ToList());
+
+            //get cold start samples
+            var groupsCounted = _concurrentBagOfDataSamples
+                .GroupBy(s => s.Labels.Values.First().Name)
+                .Select(g => new {group = g, count = g.Count()})
+                .ToList();
+            int howManyFromGroup = _coldStartSamples / groupsCounted.Count();
+            List<DataSample> learnedSamples = new List<DataSample>();
+            foreach (var group in groupsCounted)
+            {
+                learnedSamples.AddRange(group.group.OrderBy(s => randomizer.Next()).Take(Math.Min(howManyFromGroup, group.count)));
+            }
+
+            SamplesCollection learnedData = new SamplesCollection(learnedSamples);
 
             _concurrentBagOfDataSamples
                 .Skip(_coldStartSamples)
