@@ -248,8 +248,8 @@ namespace ClassificationApp.ViewModels
                 MessageBox.Show($"There's only {_concurrentBagOfDataSamples.Count} samples, cannot take {_coldStartSamples + _samplesToClassify}");
                 return;
             }
-            ConcurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
             var randomizer = new Random();
+            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_concurrentBagOfDataSamples.OrderBy(s => randomizer.Next()));
 
             //get cold start samples
             var groupsCounted = _concurrentBagOfDataSamples
@@ -265,6 +265,7 @@ namespace ClassificationApp.ViewModels
 
             SamplesCollection learnedData = new SamplesCollection(learnedSamples);
 
+            ConcurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
             _concurrentBagOfDataSamples
                 .Skip(_coldStartSamples)
                 .Take(_samplesToClassify)
