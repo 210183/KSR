@@ -23,7 +23,7 @@ namespace ClassificationApp.ViewModels
 
 
 {
-    public  class MainViewModel : BindableBase
+    public class MainViewModel : BindableBase
     {
         private string _labelName = "places";
         private int _nearestNeighboursNumber = 2;
@@ -36,6 +36,7 @@ namespace ClassificationApp.ViewModels
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
         private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
+        private List<PreProcessedSample> _listOfLearningSamples = new List<PreProcessedSample>();
         private ConcurrentBag<DataSample> _concurrentBagOfDataSamples;
         private bool _shouldUseJsonDataFile;
         private bool _isDataSgm;
@@ -50,6 +51,7 @@ namespace ClassificationApp.ViewModels
         private StopWordsFilter _stopWordsFilter = new StopWordsFilter(WellKnownNames.StopWords);
         private Lemmatizer _lemmatizer = new Lemmatizer();
         private IAttributeExtractor _extractor;
+        private decimal _learningDataRatio = new decimal(0.4);
 
         #region observable props
         public int NForNGram
@@ -123,6 +125,12 @@ namespace ClassificationApp.ViewModels
             get => _samplesToClassify;
             set => SetProperty(ref _samplesToClassify, value);
         }
+
+        public decimal LearningDataRatio
+        {
+            get => _learningDataRatio;
+            set => SetProperty(ref _learningDataRatio, value);
+        }
         #endregion
 
         #region Commands
@@ -181,29 +189,30 @@ namespace ClassificationApp.ViewModels
                     {
                         _listOfRawSamples.AddRange(DataSamplesReader.ReadAllSamples(path, LabelName));
                     }
-
-                    //load labels filter
-                    TryFilterLabels();
-
-                    ListOfPreProcessedSamples = _listOfRawSamples
-                            .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
                 }
                 else
                 {
                     _listOfRawSamples = OneLinerReader.ReadAllSamples(
                         Directory.GetFiles(DirectoryFilePath).First(p => Path.GetFileName(p) == "data.txt"),
                         LabelName);
-                    ListOfPreProcessedSamples = _listOfRawSamples
-                        .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
                     FilesInDirectory = 1;
                 }
+                TryFilterLabels();
+                var allPreProcessedSamples = _listOfRawSamples
+                    .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
+
+                //split data into learn and test
+                _listOfLearningSamples = allPreProcessedSamples.Take((int)(LearningDataRatio * allPreProcessedSamples.Count)).ToList();
+                ListOfPreProcessedSamples = allPreProcessedSamples.Skip((int)(LearningDataRatio * allPreProcessedSamples.Count)).ToList();
+
+                //create and save new keywords
+                KeywordExtractor.Extract(_listOfLearningSamples);
+
                 //save results to json
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
                 {
                     _serializer.Serialize(file, ListOfPreProcessedSamples);
                 }
-                //create and save new keywords
-                KeywordExtractor.Extract(ListOfPreProcessedSamples);
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(Directory.GetCurrentDirectory(), "keywords"), "json")))
                 {
                     _serializer.Serialize(file, KeywordsSelector.LoadKeywords());
@@ -277,6 +286,8 @@ namespace ClassificationApp.ViewModels
                     return new TFMExtractor();
                 case ExtractorType.TFMKeyWords:
                     return new KeyWordsExtractor(LoadKeywords());
+                case ExtractorType.KeywordsIndex:
+                    return new KeywordIndexExtractor(LoadKeywords());
                 case ExtractorType.NGram:
                     return new NGramExtractor(3);
                 default:

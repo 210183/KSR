@@ -5,6 +5,7 @@
         Count,
         TFMWords,
         TFMKeyWords,
+        KeywordsIndex,
         NGram
     }
 }
