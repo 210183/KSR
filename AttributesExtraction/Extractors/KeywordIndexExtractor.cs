@@ -21,7 +21,7 @@ namespace AttributesExtraction.Extractors
                     new Dictionary<string, double>(
                         KeyValues
                             .ToDictionary(
-                                kv => kv,
+                                kv => $"{kv}_index",
                                 kv => (double)s.PreProcessedArticleSample.Body.FindIndex(
                                     w => w.Equals(kv, StringComparison.InvariantCulture))))),
                 s.Labels)

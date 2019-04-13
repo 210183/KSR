@@ -10,6 +10,10 @@ namespace KeywordsExtraction
     {
         public static void Extract(List<PreProcessedSample> samples)
         {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), Constants.DirectoryName);
+            var dir = Directory.CreateDirectory(filePath);
+            dir.EnumerateFiles().ToList().ForEach(f => f.Delete());
+
             var labelGroups = samples.GroupBy(s => s.Labels.Values.First().Name);
             foreach (var labelGroup in labelGroups)
             {
@@ -20,16 +24,14 @@ namespace KeywordsExtraction
                     .Select(s => (s.Key, s.Count()))
                     .ToList();
                 counterWords.Sort((p, n) => n.Item2.CompareTo(p.Item2));
-                SaveToFile(counterWords, labelGroup.Key);
+                SaveToFile(counterWords, Path.Combine(filePath, labelGroup.Key));
             }
         }
 
-        private static void SaveToFile(List<(string word, int counter)> words, string label)
+        private static void SaveToFile(List<(string word, int counter)> words, string path)
         {
             int howManyToSave = Math.Min(100, words.Count);
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), Constants.DirectoryName);
-            Directory.CreateDirectory(filePath);
-            string path = Path.Combine(filePath, label);
+
             using (var writer = new StreamWriter(new FileStream(Path.ChangeExtension(path, Constants.FileExtensions), FileMode.Create)))
             {
                 foreach (var (word, counter) in words.Take(howManyToSave))

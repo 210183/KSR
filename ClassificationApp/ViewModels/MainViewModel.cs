@@ -137,6 +137,7 @@ namespace ClassificationApp.ViewModels
         public IRaiseCanExecuteCommand OpenDirectoryCommand { get; }
         public IRaiseCanExecuteCommand LoadFilesCommand { get; }
         public IRaiseCanExecuteCommand ExtractCommand { get; }
+        public IRaiseCanExecuteCommand ExtractMoreCommand { get; }
         public IRaiseCanExecuteCommand ClassifyCommand { get; }
         public IRaiseCanExecuteCommand ResultCommand { get; }
         public IRaiseCanExecuteCommand ChangeUseJsonDataFile { get; }
@@ -144,12 +145,15 @@ namespace ClassificationApp.ViewModels
         #endregion
 
         public ConcurrentBag<ClassifiedDataSample> ConcurrentBagOfClassifiedSamples { get; set; } = new ConcurrentBag<ClassifiedDataSample>();
+        public int HowManyPopularKeywords { get; set; } = 15;
+        public int HowManyUnpopularKeywords { get; set; } = 5;
 
         public MainViewModel()
         {
             OpenDirectoryCommand = new RelayCommand(ReadDirectoryPath);
             LoadFilesCommand = new RelayCommand(LoadFiles);
-            ExtractCommand = new RelayCommand(ExtractFromSamples);
+            ExtractCommand = new RelayCommand(ExtractNew);
+            ExtractMoreCommand = new RelayCommand(ExtractAdditional);
             ClassifyCommand = new RelayCommand(ClassifySamples);
             ResultCommand = new RelayCommand(ShowResults);
             ChangeUseJsonDataFile = new RelayCommand(() => _shouldUseJsonDataFile = !_shouldUseJsonDataFile);
@@ -189,6 +193,7 @@ namespace ClassificationApp.ViewModels
                     {
                         _listOfRawSamples.AddRange(DataSamplesReader.ReadAllSamples(path, LabelName));
                     }
+                    TryFilterLabels();
                 }
                 else
                 {
@@ -197,7 +202,6 @@ namespace ClassificationApp.ViewModels
                         LabelName);
                     FilesInDirectory = 1;
                 }
-                TryFilterLabels();
                 var allPreProcessedSamples = _listOfRawSamples
                     .Select(s => _lemmatizer.LemmatizeSample(_stopWordsFilter.Filter(s))).ToList();
 
@@ -212,10 +216,6 @@ namespace ClassificationApp.ViewModels
                 using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(DirectoryFilePath, "data"), "json")))
                 {
                     _serializer.Serialize(file, ListOfPreProcessedSamples);
-                }
-                using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(Directory.GetCurrentDirectory(), "keywords"), "json")))
-                {
-                    _serializer.Serialize(file, KeywordsSelector.LoadKeywords());
                 }
             }
         }
@@ -235,10 +235,20 @@ namespace ClassificationApp.ViewModels
             }
         }
 
-        private void ExtractFromSamples()
+        private void ExtractNew()
         {
             _extractor = ResolveExtractor();
             _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
+        }
+
+        private void ExtractAdditional()
+        {
+            _extractor = ResolveExtractor();
+            var samplesWithNewAttributes = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
+            _concurrentBagOfDataSamples.Zip(samplesWithNewAttributes,
+                (o, n) => new DataSample(
+                    new AttributesDictionary(o.Attributes.Values.Concat(n.Attributes.Values).ToDictionary(kv => kv.Key, kv => kv.Value)),
+                    o.Labels));
         }
 
         private void ClassifySamples()
@@ -314,11 +324,13 @@ namespace ClassificationApp.ViewModels
 
         private List<string> LoadKeywords()
         {
-            string keywordsPath = Path.Combine(Directory.GetCurrentDirectory(), "keywords.json");
-            if (File.Exists(keywordsPath))
-                using (JsonReader file = new JsonTextReader(File.OpenText(keywordsPath)))
-                    return _serializer.Deserialize<List<string>>(file);
-            return null;
+            var keyWords = KeywordsSelector.LoadKeywords(HowManyPopularKeywords, HowManyUnpopularKeywords);
+            using (StreamWriter file = File.CreateText(Path.ChangeExtension(Path.Combine(Directory.GetCurrentDirectory(), "keywords"), "json")))
+            {
+                _serializer.Serialize(file, keyWords);
+            }
+
+            return keyWords;
         }
     }
 }

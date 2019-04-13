@@ -7,12 +7,10 @@ namespace KeywordsExtraction
 {
     public static class KeywordsSelector
     {
-        public static List<string> LoadKeywords()
+        public static List<string> LoadKeywords(int howManyPopular, int howManyUnpopular)
         {
             Random randomizer = new Random();
             List<string> keywords = new List<string>();
-            int howManyPopular = 20;
-            int howManyUnpopular = 10;
 
             string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), Constants.DirectoryName);
             var files = Directory.GetFiles(directoryPath).Where(p => Path.GetExtension(p) == Constants.FileExtensions).ToList();
