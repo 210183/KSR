@@ -15,16 +15,19 @@ namespace ClassificationAppAutomatizer
     internal class Program
     {
         private const int K_Min = 5;
-        private const int K_Step = 123;
+        private const int K_Step = 5;
         private const int K_Max = 5;
-        private const int ColdStart_Min = 20;
-        private const int ColdStart_Step = 10;
-        private const int ColdStart_Max = 100;
-        private const int SamplesToClassify_Min = 150;
-        private const int SamplesToClassify_Step = 150;
-        private const int SamplesToClassify_Max = 150;
-        private const int ClassificationTries_Max = 5;
+        private const int ColdStart_Min = 300;
+        private const int ColdStart_Step = 300;
+        private const int ColdStart_Max = 300;
+        private const int SamplesToClassify_Min = 500;
+        private const int SamplesToClassify_Step = 500;
+        private const int SamplesToClassify_Max = 500;
+        private const int ClassificationTries_Max = 1;
         private const int KeywordsExtractionTries = 1;
+        private const decimal LearningDataRatio_Min = (decimal) 0.5;
+        private const decimal LearningDataRatio_Step = (decimal) 0.5;
+        private const decimal LearningDataRatio_Max = (decimal) 0.5;
         private const bool saveToExcel = true;
         private static List<MatrixStatistics> _statistics;
         private static List<MetricType> _metricTypes = new List<MetricType>()
@@ -38,8 +41,9 @@ namespace ClassificationAppAutomatizer
         private static List<ExtractorType> _extractorTypes = new List<ExtractorType>()
         {
             //ExtractorType.NGram,
-            //ExtractorType.TFMWords,
+            ExtractorType.TFMWords,
             ExtractorType.TFMKeyWords,
+            ExtractorType.KeywordsIndex,
         };
 
         private static void Main(string[] args)
@@ -48,30 +52,43 @@ namespace ClassificationAppAutomatizer
             MainViewModel context = new MainViewModel();
 
             context.NForNGram = 3;
-            context.LabelName = "TOPICS";
+            context.LabelName = "PLACES";
             context.ShouldUseJsonDataFile = false;
             context.IsDataSgm = true;
 
-            context.LoadFilesCommand.Execute(null);
-            for (int i = SamplesToClassify_Min; i <= SamplesToClassify_Max; i += SamplesToClassify_Step)
+            for (decimal i = LearningDataRatio_Min; i <= LearningDataRatio_Max; i += LearningDataRatio_Step)
             {
-                context.SamplesToClassify = i;
-                TestForMetricType(context, Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "results"), $"samples_{i}"));
+                context.LearningDataRatio = i;
+                context.LoadFilesCommand.Execute(null);
+                TestForLoadedFiles(context);
             }
 
             if (saveToExcel)
                 SaveSummaryToExcel(Path.Combine(Directory.GetCurrentDirectory(), "summary"));
         }
 
+        private static void TestForLoadedFiles(MainViewModel context)
+        {
+            for (int i = SamplesToClassify_Min; i <= SamplesToClassify_Max; i += SamplesToClassify_Step)
+            {
+                context.SamplesToClassify = i;
+                TestForMetricType(context, Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "results"), $"samples_{i}"));
+            }
+        }
+
         private static void TestForMetricType(MainViewModel context, string filePath)
         {
             for (int t = 0; t < KeywordsExtractionTries; t++)
             {
-                foreach (var extractor in _extractorTypes)
+
+                context.ExtractorType = _extractorTypes[0];
+                context.ExtractCommand.Execute(null);
+                TestForSamplesAmount(context, Path.Combine(filePath, $"extractor_{_extractorTypes.Select(e => e.ToString()).Aggregate((p, n) => $"{p}_{n}")}"));
+                foreach (var extractor in _extractorTypes.Skip(1))
                 {
                     context.ExtractorType = extractor;
-                    context.ExtractCommand.Execute(null);
-                    TestForSamplesAmount(context, Path.Combine(filePath, $"extractor_{extractor}"));
+                    context.ExtractMoreCommand.Execute(null);
+                    TestForSamplesAmount(context, Path.Combine(filePath, $"extractor_{_extractorTypes.Select(e => e.ToString()).Aggregate((p, n) => $"{p}_{n}")}"));
                 }
             }
         }
@@ -213,13 +230,36 @@ namespace ClassificationAppAutomatizer
             Directory.CreateDirectory(filePath);
 
             DataTable table = new DataTable();
-            table.Columns.Add("Cold start");
+            table.Columns.Add("learning data ratio");
             table.Columns.Add("Accuracy");
             table.Columns.Add("Precision");
             table.Columns.Add("Recall");
             table.Columns.Add("Specificity");
 
             int i = 0;
+
+            foreach (var extractorType in _extractorTypes)
+            {
+                table.Rows.Add(
+                    i,
+                    _statistics[i].Accuracy.ToString("F2"),
+                    _statistics[i].Precision.ToString("F2"),
+                    _statistics[i].Recall.ToString("F2"),
+                    _statistics[i].Specificity.ToString("F2"));
+                i++;
+            }
+
+            //for (decimal l = LearningDataRatio_Min; l <= LearningDataRatio_Max; l += LearningDataRatio_Step)
+            //{
+            //    table.Rows.Add(
+            //        i,
+            //        _statistics[i].Accuracy.ToString("F2"),
+            //        _statistics[i].Precision.ToString("F2"),
+            //        _statistics[i].Recall.ToString("F2"),
+            //        _statistics[i].Specificity.ToString("F2"));
+            //    i++;
+            //}
+
             //for (int k = K_Min; k <= K_Max; k += K_Step)
             //{
             //    table.Rows.Add(
@@ -230,16 +270,16 @@ namespace ClassificationAppAutomatizer
             //        _statistics[i].Specificity.ToString("F2"));
             //    i++;
             //}
-            for (int k = ColdStart_Min; k <= ColdStart_Max; k += ColdStart_Step)
-            {
-                table.Rows.Add(
-                    k,
-                    _statistics[i].Accuracy.ToString("F2"),
-                    _statistics[i].Precision.ToString("F2"),
-                    _statistics[i].Recall.ToString("F2"),
-                    _statistics[i].Specificity.ToString("F2"));
-                i++;
-            }
+            //for (int k = ColdStart_Min; k <= ColdStart_Max; k += ColdStart_Step)
+            //{
+            //    table.Rows.Add(
+            //        k,
+            //        _statistics[i].Accuracy.ToString("F2"),
+            //        _statistics[i].Precision.ToString("F2"),
+            //        _statistics[i].Recall.ToString("F2"),
+            //        _statistics[i].Specificity.ToString("F2"));
+            //    i++;
+            //}
             //for (int j = SamplesToClassify_Min; j <= SamplesToClassify_Max; j += SamplesToClassify_Step)
             //{
             //    table.Rows.Add(
