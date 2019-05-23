@@ -1,4 +1,10 @@
-﻿using AttributesExtraction;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using AttributesExtraction;
 using AttributesExtraction.Extractors;
 using Classification;
 using Classification.Metrics;
@@ -12,16 +18,8 @@ using FileSamplesRead;
 using FileSamplesRead.Models;
 using KeywordsExtraction;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace ClassificationApp.ViewModels
-
-
 {
     public class MainViewModel : BindableBase
     {
@@ -31,7 +29,7 @@ namespace ClassificationApp.ViewModels
         private int _samplesToClassify = 1000;
         private ExtractorType _extractorType;
         private MetricType _metricType;
-        private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters_przetworzone";
+        private string _directoryFilePath = @"C:\Users\Mateusz.Galasinski\Desktop\reuters";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
@@ -245,10 +243,16 @@ namespace ClassificationApp.ViewModels
         {
             _extractor = ResolveExtractor();
             var samplesWithNewAttributes = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
-            _concurrentBagOfDataSamples.Zip(samplesWithNewAttributes,
-                (o, n) => new DataSample(
-                    new AttributesDictionary(o.Attributes.Values.Concat(n.Attributes.Values).ToDictionary(kv => kv.Key, kv => kv.Value)),
-                    o.Labels));
+            //_concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(
+            _concurrentBagOfDataSamples
+                .Zip(samplesWithNewAttributes,
+                    (o, n) => new DataSample(
+                        new AttributesDictionary(o.Attributes.Values
+                            .Distinct()
+                            .Concat(n.Attributes.Values)
+                            .ToDictionary(kv => kv.Key, kv => kv.Value)),
+                        o.Labels));
+            //);
         }
 
         private void ClassifySamples()
@@ -258,10 +262,12 @@ namespace ClassificationApp.ViewModels
                 MessageBox.Show($"There's only {_concurrentBagOfDataSamples.Count} samples, cannot take {_coldStartSamples + _samplesToClassify}");
                 return;
             }
-            var randomizer = new Random();
-            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_concurrentBagOfDataSamples.OrderBy(s => randomizer.Next()));
-            var learnedData = new SamplesCollection(_concurrentBagOfDataSamples
-                .Take(_coldStartSamples).ToList());
+            //var randomizer = new Random();
+            //_concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_concurrentBagOfDataSamples.OrderBy(s => randomizer.Next()));
+            var learnedData = new SamplesCollection(
+                _concurrentBagOfDataSamples
+                .Take(_coldStartSamples)
+                .ToList());
 
             ConcurrentBagOfClassifiedSamples = new ConcurrentBag<ClassifiedDataSample>();
             _concurrentBagOfDataSamples
