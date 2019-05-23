@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using AttributesExtraction;
+﻿using AttributesExtraction;
 using AttributesExtraction.Extractors;
 using Classification;
 using Classification.Metrics;
@@ -18,6 +12,12 @@ using FileSamplesRead;
 using FileSamplesRead.Models;
 using KeywordsExtraction;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace ClassificationApp.ViewModels
 {
@@ -29,13 +29,14 @@ namespace ClassificationApp.ViewModels
         private int _samplesToClassify = 1000;
         private ExtractorType _extractorType;
         private MetricType _metricType;
-        private string _directoryFilePath = @"C:\Users\Mateusz.Galasinski\Desktop\reuters";
+        private string _directoryFilePath = @"C:\Users\Mateusz\Desktop\reuters";
+        private const string _chosenDataPath = @".\data\data.json";
         private int _filesInDirectory;
         private List<string> _listOfFiles;
         private List<RawSample> _listOfRawSamples;
         private List<PreProcessedSample> _listOfPreProcessedSamples = new List<PreProcessedSample>();
         private List<PreProcessedSample> _listOfLearningSamples = new List<PreProcessedSample>();
-        private ConcurrentBag<DataSample> _concurrentBagOfDataSamples;
+        private ConcurrentQueue<DataSample> _concurrentBagOfDataSamples;
         private bool _shouldUseJsonDataFile;
         private bool _isDataSgm;
         private bool _showNGramInput = false;
@@ -207,6 +208,9 @@ namespace ClassificationApp.ViewModels
                 _listOfLearningSamples = allPreProcessedSamples.Take((int)(LearningDataRatio * allPreProcessedSamples.Count)).ToList();
                 ListOfPreProcessedSamples = allPreProcessedSamples.Skip((int)(LearningDataRatio * allPreProcessedSamples.Count)).ToList();
 
+                var randomizer = new Random();
+                ListOfPreProcessedSamples = ListOfPreProcessedSamples.OrderBy(s => randomizer.Next()).ToList();
+
                 //create and save new keywords
                 KeywordExtractor.Extract(_listOfLearningSamples);
 
@@ -236,13 +240,13 @@ namespace ClassificationApp.ViewModels
         private void ExtractNew()
         {
             _extractor = ResolveExtractor();
-            _concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
+            _concurrentBagOfDataSamples = new ConcurrentQueue<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
         }
 
         private void ExtractAdditional()
         {
             _extractor = ResolveExtractor();
-            var samplesWithNewAttributes = new ConcurrentBag<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
+            var samplesWithNewAttributes = new ConcurrentQueue<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
             //_concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(
             _concurrentBagOfDataSamples
                 .Zip(samplesWithNewAttributes,
@@ -262,8 +266,6 @@ namespace ClassificationApp.ViewModels
                 MessageBox.Show($"There's only {_concurrentBagOfDataSamples.Count} samples, cannot take {_coldStartSamples + _samplesToClassify}");
                 return;
             }
-            //var randomizer = new Random();
-            //_concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(_concurrentBagOfDataSamples.OrderBy(s => randomizer.Next()));
             var learnedData = new SamplesCollection(
                 _concurrentBagOfDataSamples
                 .Take(_coldStartSamples)
