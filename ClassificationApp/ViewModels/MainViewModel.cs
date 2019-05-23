@@ -247,16 +247,16 @@ namespace ClassificationApp.ViewModels
         {
             _extractor = ResolveExtractor();
             var samplesWithNewAttributes = new ConcurrentQueue<DataSample>(_extractor.Extract(ListOfPreProcessedSamples));
-            //_concurrentBagOfDataSamples = new ConcurrentBag<DataSample>(
-            _concurrentBagOfDataSamples
-                .Zip(samplesWithNewAttributes,
-                    (o, n) => new DataSample(
-                        new AttributesDictionary(o.Attributes.Values
-                            .Distinct()
-                            .Concat(n.Attributes.Values)
-                            .ToDictionary(kv => kv.Key, kv => kv.Value)),
-                        o.Labels));
-            //);
+            _concurrentBagOfDataSamples = new ConcurrentQueue<DataSample>(
+                _concurrentBagOfDataSamples
+                    .Zip(samplesWithNewAttributes,
+                        (o, n) => new DataSample(
+                            new AttributesDictionary(o.Attributes.Values
+                                .Concat(n.Attributes.Values)
+                                .GroupBy(a => a.Key)
+                                .Select(group => group.First())
+                                .ToDictionary(kv => kv.Key, kv => kv.Value)),
+                            o.Labels)));
         }
 
         private void ClassifySamples()
